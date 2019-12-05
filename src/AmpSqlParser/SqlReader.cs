@@ -48,7 +48,7 @@ namespace AmpSqlParser
 
             while(depth >= _peek.Count)
             {
-                _peek.Enqueue(Reader.Read());
+                _peek.Enqueue(DoRead());
             }
             if (depth == 0)
                 return _peek.Peek();
@@ -63,17 +63,17 @@ namespace AmpSqlParser
 
         public override int Read()
         {
-            int c = DoRead();
+            int c;
+
+            if (_peek.Count > 0)
+            {
+                c = _peek.Dequeue();
+            }
+            else
+                c = DoRead();
+
             if (c < 0)
                 return c;
-
-            if (c == '\r' && Peek() == '\n')
-            {
-                if (DoRead() < 0)
-                    return -1;
-
-                c = '\n';
-            }
 
             if (_lastC > 0)
             {
@@ -93,12 +93,12 @@ namespace AmpSqlParser
 
         private int DoRead()
         {
-            if (_peek.Count > 0)
-            {
-                return _peek.Dequeue();
-            }
-            else
-                return Reader.Read();
+            int c= Reader.Read();
+
+            if (c == '\r' && Reader.Peek() == '\n')
+                return Reader.Read(); // Return just the '\n
+
+            return c;
         }
     }
 }

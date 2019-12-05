@@ -30,7 +30,7 @@ namespace AmpSqlParser
                 AmpPosition leadStart = Reader.GetPosition();
 
                 ScanLeadingTrivia(ref cR, out var leadingTrivia);
-                if (Reader.Peek() < 0)
+                if (cR < 0)
                 {
                     if (leadingTrivia?.Count > 0)
                         yield return new SqlToken(SqlKind.EndOfStream, "", new SqlPosition(Reader.GetPosition()), leadingTrivia, null);
@@ -100,8 +100,7 @@ namespace AmpSqlParser
                                 kind = SqlKind.NotEqualToken;
                                 break;
                             default:
-                                kind = SqlKind.BinaryOperatorToken;
-                                break;
+                                throw new NotImplementedException();
                         }
                         break;
                     case '|' when Reader.Peek() == '|':
@@ -111,11 +110,11 @@ namespace AmpSqlParser
                         break;
                     case ';':
                         Buffer.Append(';');
-                        kind = SqlKind.SemiColonToken;
+                        kind = SqlKind.SemiColonOperatorToken;
                         break;
                     case ':':
                         Buffer.Append(':');
-                        kind = SqlKind.ColonToken;
+                        kind = SqlKind.ColonOperatorToken;
                         break;
                     case ',':
                         Buffer.Append(',');
@@ -123,7 +122,7 @@ namespace AmpSqlParser
                         break;
                     case '.':
                         Buffer.Append('.');
-                        kind = SqlKind.OpenParenToken;
+                        kind = SqlKind.DotToken;
                         break;
                     case '(':
                         Buffer.Append('(');
@@ -136,7 +135,7 @@ namespace AmpSqlParser
                     case '=' when Reader.Peek() == '=' && Dialect == SqlDialect.SqLite:
                         Buffer.Append(c);
                         Buffer.Append((char)Reader.Read());
-                        kind = SqlKind.EqualToken;
+                        kind = SqlKind.EqualOperatorToken;
                         break;
                     case '=' when Reader.Peek() == '>' && Dialect == SqlDialect.Oracle:
                         Buffer.Append(c);
@@ -150,7 +149,7 @@ namespace AmpSqlParser
                         break;
                     case '=':
                         Buffer.Append('=');
-                        kind = SqlKind.EqualToken;
+                        kind = SqlKind.EqualOperatorToken;
                         break;
                     case '[':
                         Buffer.Append('[');
@@ -159,6 +158,10 @@ namespace AmpSqlParser
                     case ']':
                         Buffer.Append(']');
                         kind = SqlKind.CloseBracket;
+                        break;
+                    case '&':
+                        Buffer.Append('&');
+                        kind = SqlKind.AmpersandToken;
                         break;
                     case '?' when Reader.Peek() == '?' && Reader.Peek(1) == '(':
                         Buffer.Append(c);
@@ -178,11 +181,11 @@ namespace AmpSqlParser
                         break;
                     case '+':
                         Buffer.Append('+');
-                        kind = SqlKind.PlusToken;
+                        kind = SqlKind.PlusOperatorToken;
                         break;
                     case '-':
                         Buffer.Append('-');
-                        kind = SqlKind.MinusToken;
+                        kind = SqlKind.MinusOperatorToken;
                         break;
                     case '/':
                         Buffer.Append('/');
@@ -190,7 +193,7 @@ namespace AmpSqlParser
                         break;
                     case '%':
                         Buffer.Append('%');
-                        kind = SqlKind.PercentToken;
+                        kind = SqlKind.PercentOperatorToken;
                         break;
                     default:
                         if (char.IsLetter(c) || c == '_')
@@ -224,7 +227,7 @@ namespace AmpSqlParser
                                     gotE = true;
                             }
 
-                            kind = (gotDot || gotE) ? SqlKind.DoubleToken : SqlKind.IntToken;
+                            kind = (gotDot || gotE) ? SqlKind.DoubleValueToken : SqlKind.IntValueToken;
                         }
                         else
                         {
@@ -271,10 +274,10 @@ namespace AmpSqlParser
 
                     while (true)
                     {
-                        cR = Reader.Peek();
+                        cR = Reader.Read();
                         if (cR < 0)
                             break;
-                        c = (char)Reader.Read();
+                        c = (char)cR;
                         Buffer.Append(c);
 
                         if (c == '*' && Reader.Peek() == '/')
@@ -365,6 +368,32 @@ namespace AmpSqlParser
                         trailingTrivia = new List<SqlTrivia>();
 
                     trailingTrivia.Add(new SqlTrivia(SqlTriviaKind.LineComment, Buffer.ToString()));
+                    Buffer.Clear();
+                }
+                else if (cR == '/' && Reader.Peek(1) == '*')
+                {
+                    Buffer.Append("/*");
+                    Reader.Read(); // '/'
+                    Reader.Read(); // '*'
+
+                    while (true)
+                    {
+                        cR = Reader.Read();
+                        if (cR < 0)
+                            break;
+                        char c = (char)cR;
+                        Buffer.Append(c);
+
+                        if (c == '*' && Reader.Peek() == '/')
+                        {
+                            Buffer.Append((char)Reader.Read()); // '/'
+                            break;
+                        }
+                    }
+                    if (trailingTrivia == null)
+                        trailingTrivia = new List<SqlTrivia>();
+
+                    trailingTrivia.Add(new SqlTrivia(SqlTriviaKind.BlockComment, Buffer.ToString()));
                     Buffer.Clear();
                 }
                 else

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using K = AmpSqlParser.SqlKind;
 
 namespace AmpSqlParser.Tests
 {
@@ -50,6 +51,255 @@ namespace AmpSqlParser.Tests
 
                     Assert.AreEqual(expected, actual);
                 }
+            }
+        }
+
+        [TestMethod]
+        public void TestQueryWithJoin()
+        {
+            using (StringReader sr = new StringReader(@"
+                    SELECT * From MyTable m
+                    LEFT JOIN OtherTable o on m.OtherId = o.Id
+                    WHERE q=r and s=1
+                    ORDER BY Something"))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                Assert.AreEqual(28, kinds.Length);
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.AsteriksToken, K.FromToken, K.IdentifierToken, K.IdentifierToken,
+                    K.LeftToken, K.JoinToken, K.IdentifierToken, K.IdentifierToken, K.OnToken, K.IdentifierToken, K.DotToken, K.IdentifierToken, K.EqualOperatorToken, K.IdentifierToken, K.DotToken, K.IdentifierToken,
+                    K.WhereToken, K.IdentifierToken, K.EqualOperatorToken, K.IdentifierToken, K.AndToken, K.IdentifierToken, K.EqualOperatorToken, K.IntValueToken,
+                    K.OrderToken, K.ByToken, K.IdentifierToken},
+                    kinds);
+
+            }
+        }
+
+        [TestMethod]
+        public void TestEof1()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1"))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x=>x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestEof2()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1 /* QQQQ"))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestEof3()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1 /* QQQQ
+                    "))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestEof4()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1 /* QQQQ
+                    */ --"))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestEof5()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1 /* QQQQ
+                    */" + "\r\n"))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestEof5A()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1 /* QQQQ
+                    */" + "\r\n "))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken, K.EndOfStream},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestEof6()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1 -- QQQQ"))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r",""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestEof6A()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1 -- B" + "\r\n"))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestEof6B()
+        {
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
+                    /*
+                    */ SELECT 1 -- C" + "\r\n "))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken, K.IntValueToken, K.EndOfStream},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
             }
         }
     }

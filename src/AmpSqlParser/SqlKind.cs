@@ -318,8 +318,8 @@ namespace AmpSqlParser
 
 
         BinaryOperatorToken,
-        SemiColonToken,
-        ColonToken,
+        SemiColonOperatorToken,
+        ColonOperatorToken,
         CommaToken,
         OpenParenToken,
         EndOfStream,
@@ -327,12 +327,12 @@ namespace AmpSqlParser
         UnknownCharToken,
         DescendingToken,
         CloseParenToken,
-        EqualToken,
+        EqualOperatorToken,
         AsteriksToken,
-        PlusToken,
-        MinusToken,
+        PlusOperatorToken,
+        MinusOperatorToken,
         DivToken,
-        PercentToken,
+        PercentOperatorToken,
         LessThanToken,
         GreaterThanToken,
         LessThanOrEqualToken,
@@ -386,5 +386,9 @@ namespace AmpSqlParser
         ModeToken,
         OpenBracket,
         CloseBracket,
+        DotToken,
+        AmpersandToken,
+        IntValueToken,
+        DoubleValueToken,
     }
 }
