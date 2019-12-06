@@ -8,7 +8,7 @@ namespace Amp.Linq
     /// Marker class to mark support for <see cref="TreeElement{T}"/> and <see cref="TreeQueryable"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ITree<out T>
+    public interface ITree<T>
     {
     }
 }

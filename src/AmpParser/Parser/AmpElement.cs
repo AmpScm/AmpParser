@@ -2,30 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq.Expressions;
 using System.Text;
 using Amp.Tokenizer;
 
 namespace Amp.Parser
 {
-    public abstract class AmpElement<TKind> : IFormattable
-        where TKind : Enum
+    public abstract class AmpElement : IFormattable
     {
-        protected AmpElement()
-        {
-
-        }
-
-        /// <summary>
-        /// Gets the syntax/token kind
-        /// </summary>
-        public TKind Kind { get; protected set; }
-
-        protected int KindValue
-        {
-            get => AmpKindConverter<TKind>.ToInt(Kind);
-        }
-
         public sealed override string ToString()
         {
             return ToString("", CultureInfo.InvariantCulture, false, false);
@@ -60,26 +43,6 @@ namespace Amp.Parser
         /// 
         /// </summary>
         public virtual bool IsError { get; set; }
-    }
 
-    sealed class AmpKindConverter<TKind> where TKind : Enum
-    {
-        static Func<TKind, int> _convert;
-        internal static int ToInt(TKind kind)
-        {
-            if (_convert == null)
-            {
-                ParameterExpression pKind = Expression.Parameter(typeof(TKind), "kind");
-
-                Expression op = Expression.Convert(pKind, Enum.GetUnderlyingType(typeof(TKind)));
-
-                if (op.Type != typeof(int))
-                    op = Expression.Convert(op, typeof(int));
-
-                _convert = Expression.Lambda<Func<TKind, int>>(op, pKind).Compile();
-            }
-
-            return _convert(kind);
-        }
     }
 }

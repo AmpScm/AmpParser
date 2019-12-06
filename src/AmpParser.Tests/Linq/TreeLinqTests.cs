@@ -99,6 +99,8 @@ namespace AmpParser.Tests.Linq
         [TestMethod]
         public void SimpleDescendantsTest()
         {
+            Assert.AreEqual("A",
+                string.Join("", root.TreeDescendantsAndSelf().Select(x => x.Value)));
             Assert.AreEqual("ABC",
                 string.Join("", simpleList.TreeDescendantsAndSelf().Select(x => x.Value)));
             Assert.AreEqual("ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -138,6 +140,8 @@ namespace AmpParser.Tests.Linq
             Assert.AreEqual("", string.Join("", Q.Children));
             Assert.AreEqual("", string.Join("", Q.Descendants));
             Assert.AreEqual("Q", string.Join("", Q.DescendantsAndSelf));
+            Assert.AreEqual("", string.Join("", Q.Leafs));
+            Assert.AreEqual("Q", string.Join("", Q.LeafsIncludingSelf));
             Assert.AreEqual("RSTUVWXYZ", string.Join("", Q.Following));
             Assert.AreEqual("RSZ", string.Join("", Q.FollowingSiblings));
             Assert.AreEqual("QRSZ", string.Join("", Q.FollowingSiblingsAndSelf));
@@ -158,6 +162,8 @@ namespace AmpParser.Tests.Linq
             Assert.AreEqual("TUXY", string.Join("", S.Children));
             Assert.AreEqual("TUVWXY", string.Join("", S.Descendants));
             Assert.AreEqual("STUVWXY", string.Join("", S.DescendantsAndSelf));
+            Assert.AreEqual("TVWXY", string.Join("", S.Leafs));
+            Assert.AreEqual("TVWXY", string.Join("", S.LeafsIncludingSelf));
             Assert.AreEqual("Z", string.Join("", S.Following));
             Assert.AreEqual("Z", string.Join("", S.FollowingSiblings));
             Assert.AreEqual("SZ", string.Join("", S.FollowingSiblingsAndSelf));
@@ -193,6 +199,13 @@ namespace AmpParser.Tests.Linq
                 n++;
             }
             Assert.AreEqual(66, n);
+        }
+
+        [TestMethod]
+        public void SkipLastTest()
+        {
+            Assert.AreEqual("ABCDEFGHIJKLMNOPQRSTU", string.Join("", "ABCDEFGHIJKLMNOPQRSTUVWXYZ".SkipLast(5)));
+
         }
     }
 }

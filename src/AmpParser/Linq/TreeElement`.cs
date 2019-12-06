@@ -58,6 +58,21 @@ namespace Amp.Linq
             get => Descendants.Prepend(this);
         }
 
+        /// <summary>
+        /// Enumerates the descendants that don't have children
+        /// </summary>
+        public IQueryable<TreeElement<T>> Leafs
+        {
+            get => Descendants.Where(x => !x.Children.Any());
+        }
+
+        /// <summary>
+        /// Enumerates the descendants that don't have children, including the node itself if it doesn't have children
+        /// </summary>
+        public IQueryable<TreeElement<T>> LeafsIncludingSelf
+        {
+            get => DescendantsAndSelf.Where(x => !x.Children.Any());
+        }
 
         /// <summary>
         /// Enumerates everything that follows the node in tree order.

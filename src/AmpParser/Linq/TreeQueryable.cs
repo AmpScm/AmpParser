@@ -7,10 +7,10 @@ namespace Amp.Linq
 {
     public static class TreeQueryable
     {
-        public static TreeElement<T> AsTree<T>(this T rootNode)
-            where T : class, ITree<T>
+        public static TreeElement<T> AsTree<T>(this ITree<T> rootNode)
+            where T : class
         {
-            return new TreeElement<T>(rootNode);
+            return new TreeElement<T>((T)rootNode);
         }
 
         public static IQueryable<TreeElement<T>> TreeChildren<T>(this T rootNode)
@@ -24,6 +24,14 @@ namespace Amp.Linq
         public static IQueryable<TreeElement<T>> TreeDescendantsAndSelf<T>(this T rootNode)
             where T : class, ITree<T>
         => rootNode.AsTree().DescendantsAndSelf;
+
+        public static IQueryable<TreeElement<T>> TreeLeafs<T>(this T rootNode)
+            where T : class, ITree<T>
+        => rootNode.AsTree().Leafs;
+
+        public static IQueryable<TreeElement<T>> TreeLeafsIncludingSelf<T>(this T rootNode)
+            where T : class, ITree<T>
+        => rootNode.AsTree().LeafsIncludingSelf;
 
         public static IQueryable<TreeElement<T>> TreeFollowing<T>(this T item)
             where T : class, ITree<T>
@@ -50,14 +58,39 @@ namespace Amp.Linq
         => item.AsTree().PrecedingSiblingsAndSelf;
 
 #if prenetstandard21
-        internal static IQueryable<TSource> Prepend<TSource>(this IQueryable<TSource> source, TSource element)
+        public static IQueryable<TSource> Prepend<TSource>(this IQueryable<TSource> source, TSource element)
         {
             return SingleQueryable(element).Concat(source);
         }
 
-        internal static IQueryable<TSource> Append<TSource>(this IQueryable<TSource> source, TSource element)
+        public static IQueryable<TSource> Append<TSource>(this IQueryable<TSource> source, TSource element)
         {
             return source.Concat(SingleQueryable(element));
+        }
+
+        public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source, int skip)
+        {
+            if (skip < 0)
+                throw new ArgumentOutOfRangeException(nameof(skip));
+
+            using (IEnumerator<T> m = source.GetEnumerator())
+            {
+                T[] buf = new T[skip];
+
+                for (int i = 0; i < skip; i++)
+                {
+                    if (!m.MoveNext())
+                        yield break;
+
+                    buf[i] = m.Current;
+                }
+
+                for (int i = 0; m.MoveNext(); i = (i+1) % skip)
+                {
+                    yield return buf[i];
+                    buf[i] = m.Current;
+                }
+            }
         }
 #endif
 
