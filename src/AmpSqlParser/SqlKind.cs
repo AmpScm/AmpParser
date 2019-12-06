@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AmpSqlParser
+namespace Amp.SqlParser
 {
     public enum SqlKind
     {
@@ -501,5 +501,7 @@ namespace AmpSqlParser
         VacuumToken,
         VirtualToken,
         WindowToken,
+        IncompleteStringToken,
+        IncompleteQuotedIdentifierToken,
     }
 }

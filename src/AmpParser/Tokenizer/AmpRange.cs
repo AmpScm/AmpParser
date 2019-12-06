@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AmpTokenizer
+namespace Amp.Tokenizer
 {
     public class AmpRange
     {

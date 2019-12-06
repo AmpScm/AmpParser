@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using AmpTokenizer;
+using Amp.Parser;
+using Amp.Tokenizer;
 
-namespace AmpSqlParser
+namespace Amp.SqlParser
 {
     public class SqlTokenizer : AmpTokenizer<SqlToken, SqlKind>
     {
         public SqlTokenizer(SqlReader reader)
-            : base(reader)
         {
             Reader = reader;
         }
 
         readonly StringBuilder Buffer = new StringBuilder();
 
-        public new SqlReader Reader { get; }
+        public SqlReader Reader { get; }
 
         public SqlDialect Dialect { get; set; }
 
@@ -27,25 +27,27 @@ namespace AmpSqlParser
 
             while (0 <= (cR = Reader.Read()))
             {
-                AmpPosition leadStart = Reader.GetPosition();
+                SqlPosition leadStart = Reader.GetPosition();
 
                 ScanLeadingTrivia(ref cR, out var leadingTrivia);
                 if (cR < 0)
                 {
                     if (leadingTrivia?.Count > 0)
-                        yield return new SqlToken(SqlKind.EndOfStream, "", new SqlPosition(Reader.GetPosition()), leadingTrivia, null);
+                        yield return new SqlToken(SqlKind.EndOfStream, "", Reader.GetPosition(), Reader.GetPosition(), leadingTrivia, trailing: null);
                     yield break;
                 }
 
                 char c = (char)cR;
 
-                AmpPosition start = (leadingTrivia?.Count > 0) ? Reader.GetPosition() : leadStart;
+                SqlPosition start = (leadingTrivia?.Count > 0) ? Reader.GetPosition() : leadStart;
                 SqlKind kind;
                 switch (c)
                 {
                     case '\'':
                     case '\"':
                         Buffer.Append(c);
+
+                        kind = (c == '\'') ? SqlKind.IncompleteStringToken : SqlKind.IncompleteQuotedIdentifierToken;
 
                         while (Reader.Peek() > 0)
                         {
@@ -55,12 +57,34 @@ namespace AmpSqlParser
                             if (cR == c)
                             {
                                 if (Reader.Peek() != c)
+                                {
+                                    kind = (c == '\'') ? SqlKind.StringToken : SqlKind.QuotedIdentifierToken;
                                     break;
+                                }
 
                                 Buffer.Append((char)Reader.Read());
                             }
                         }
-                        kind = (c == '\'') ? SqlKind.StringToken : SqlKind.QuotedIdentifierToken;
+                        break;
+                    case '[' when IsSqlServer || IsSqlite:
+                        Buffer.Append(c);
+
+                        kind = SqlKind.IncompleteQuotedIdentifierToken;
+
+                        while ((cR = Reader.Peek()) > 0)
+                        {
+                            if (char.IsWhiteSpace((char)cR))
+                                break; // Turn into error and continue parsing
+
+                            cR = Reader.Read();
+                            Buffer.Append((char)cR);
+
+                            if (cR == ']')
+                            {
+                                kind = SqlKind.QuotedIdentifierToken;
+                                break;
+                            }
+                        }
                         break;
                     case '!' when Reader.Peek() == '=':
                     case '^' when Reader.Peek() == '=' && IsOracle:
@@ -243,10 +267,25 @@ namespace AmpSqlParser
                 string text = Buffer.ToString();
                 Buffer.Clear();
 
+                var end = Reader.GetPosition();
                 ScanTrailingTrivia(out var trailingTrivia);
 
-                yield return new SqlToken(kind, text, new SqlPosition(start), leadingTrivia, trailingTrivia);
+                yield return new SqlToken(kind, text, start, end, leadingTrivia, trailingTrivia)
+                {
+                    IsError = IsErrorKind(kind)
+                };
+            };
+        }
+
+        private bool IsErrorKind(SqlKind kind)
+        {
+            switch(kind)
+            {
+                case SqlKind.IncompleteQuotedIdentifierToken:
+                case SqlKind.IncompleteStringToken:
+                    return true;
             }
+            return false;
         }
 
         private bool NumberFollows(int v)

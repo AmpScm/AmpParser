@@ -4,8 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text;
+using Amp.Tokenizer;
 
-namespace AmpTokenizer
+namespace Amp.Parser
 {
     public abstract class AmpElement<TKind> : IFormattable
         where TKind : Enum
@@ -58,7 +59,7 @@ namespace AmpTokenizer
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool IsError => false;
+        public virtual bool IsError { get; set; }
     }
 
     sealed class AmpKindConverter<TKind> where TKind : Enum

@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using K = AmpSqlParser.SqlKind;
+using Amp.SqlParser;
+using K = Amp.SqlParser.SqlKind;
 
 namespace AmpSqlParser.Tests
 {
@@ -340,6 +341,147 @@ namespace AmpSqlParser.Tests
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestIdentifier()
+        {
+            for(SqlDialect dialect = SqlDialect.None; dialect <= SqlDialect.SqlServer; dialect++)
+            {
+                string expected;
+
+                using (StringReader sr = new StringReader(expected = @"SELECT aa"))
+                using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+                using (SqlTokenizer tk = new SqlTokenizer(rdr))
+                {
+                    tk.Dialect = dialect;
+                    var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                    var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                    Assert.AreEqual(2, kinds.Length);
+
+                    ParseAssert.AreEqual(new SqlKind[] {
+                        K.SelectToken, K.IdentifierToken},
+                    kinds);
+
+                    Assert.AreEqual("aa", tokens.Last().ToString());
+                    Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                }
+
+                using (StringReader sr = new StringReader(expected = @"SELECT ""aa"""))
+                using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+                using (SqlTokenizer tk = new SqlTokenizer(rdr))
+                {
+                    tk.Dialect = dialect;
+
+                    var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                    var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                    Assert.AreEqual(2, kinds.Length);
+
+                    ParseAssert.AreEqual(new SqlKind[] {
+                        K.SelectToken, K.QuotedIdentifierToken},
+                    kinds);
+
+                    Assert.AreEqual("\"aa\"", tokens.Last().ToString());
+                    Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                }
+
+                using (StringReader sr = new StringReader(expected = @"SELECT ""aa"))
+                using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+                using (SqlTokenizer tk = new SqlTokenizer(rdr))
+                {
+                    tk.Dialect = dialect;
+
+                    var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                    var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                    Assert.AreEqual(2, kinds.Length);
+
+                    ParseAssert.AreEqual(new SqlKind[] {
+                        K.SelectToken, K.IncompleteQuotedIdentifierToken},
+                    kinds);
+
+                    Assert.AreEqual("\"aa", tokens.Last().ToString());
+                    Assert.IsTrue(tokens.Last().IsError);
+                    Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                }
+
+                using (StringReader sr = new StringReader(expected = @"SELECT [aa"))
+                using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+                using (SqlTokenizer tk = new SqlTokenizer(rdr))
+                {
+                    tk.Dialect = dialect;
+
+                    var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                    var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                    if (dialect == SqlDialect.SqLite || dialect == SqlDialect.SqlServer)
+                    {
+                        Assert.AreEqual(2, kinds.Length);
+
+                        ParseAssert.AreEqual(new SqlKind[] {
+                            K.SelectToken, K.IncompleteQuotedIdentifierToken},
+                        kinds);
+
+                        Assert.AreEqual("[aa", tokens.Last().ToString());
+                        Assert.IsTrue(tokens.Last().IsError);
+                        Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                    }
+                    else
+                    {
+                        Assert.AreEqual(3, kinds.Length);
+
+                        ParseAssert.AreEqual(new SqlKind[] {
+                            K.SelectToken, K.OpenBracket, K.IdentifierToken},
+                        kinds);
+
+                        Assert.AreEqual("aa", tokens.Last().ToString());
+                        Assert.IsFalse(tokens.Last().IsError);
+                        Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                    }
+                }
+
+                using (StringReader sr = new StringReader(expected = @"SELECT [aa]"))
+                using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+                using (SqlTokenizer tk = new SqlTokenizer(rdr))
+                {
+                    tk.Dialect = dialect;
+
+                    var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                    var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                    if (dialect == SqlDialect.SqLite || dialect == SqlDialect.SqlServer)
+                    {
+                        Assert.AreEqual(2, kinds.Length);
+
+                        ParseAssert.AreEqual(new SqlKind[] {
+                            K.SelectToken, K.QuotedIdentifierToken},
+                        kinds);
+
+                        Assert.AreEqual("[aa]", tokens.Last().ToString());
+                        Assert.IsFalse(tokens.Last().IsError);
+                        Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                    }
+                    else
+                    {
+                        Assert.AreEqual(4, kinds.Length);
+
+                        ParseAssert.AreEqual(new SqlKind[] {
+                            K.SelectToken, K.OpenBracket, K.IdentifierToken, K.CloseBracket},
+                        kinds);
+
+                        Assert.AreEqual("aa", tokens.Reverse().Skip(1).First().ToString());
+                        Assert.IsFalse(tokens.Last().IsError);
+                        Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                    }
+                }
             }
         }
     }

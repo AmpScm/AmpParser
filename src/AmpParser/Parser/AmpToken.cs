@@ -5,12 +5,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Amp.Tokenizer;
 
-namespace AmpTokenizer
+namespace Amp.Parser
 {
     [DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public abstract class AmpToken<TKind> : AmpElement<TKind>
-        where TKind : Enum
+        where TKind : struct, Enum
     {
         protected AmpToken(TKind kind)
         {

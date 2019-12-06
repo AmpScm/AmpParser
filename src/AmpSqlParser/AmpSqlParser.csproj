@@ -1,11 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RepositoryUrl>https://github.com/ampscm/ampparser/</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>AmpSqlParser.snk</AssemblyOriginatorKeyFile>
+    <AssemblyName>AmpSqlParser</AssemblyName>
+    <RootNamespace>Amp.SqlParser</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AmpTokenizer\AmpTokenizer.csproj" />
+    <ProjectReference Include="..\AmpParser\AmpParser.csproj" />
   </ItemGroup>
 
 </Project>

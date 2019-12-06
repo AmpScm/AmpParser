@@ -7,8 +7,8 @@ using System.Text;
 namespace Amp.Linq
 {
     [DebuggerDisplay("{Value,nq}")]
-    public class TreeElement<T> : IEquatable<TreeElement<T>>
-        where T : class, ITree<T>
+    public sealed class TreeElement<T> : IEquatable<TreeElement<T>>
+        where T : class
     {
         public TreeElement(T item)
         {
@@ -19,7 +19,7 @@ namespace Amp.Linq
         public TreeElement(T item, IQueryable<TreeElement<T>> ancestors)
         {
             Value = item;
-            Ancestors = ancestors;
+            Ancestors = ancestors ?? TreeQueryable.EmptyQueryable<TreeElement<T>>();
         }
 
         public T Value { get; }
@@ -34,7 +34,7 @@ namespace Amp.Linq
         /// </summary>
         public IQueryable<TreeElement<T>> AncestorsAndSelf
         {
-            get => TreeQueryable.SingleQueryable(this).Concat(Ancestors);
+            get => Ancestors.Prepend(this);
         }
 
         public IQueryable<TreeElement<T>> Children
@@ -47,7 +47,7 @@ namespace Amp.Linq
         /// </summary>
         public IQueryable<TreeElement<T>> Descendants
         {
-            get => Children.SelectMany(x => TreeQueryable.SingleQueryable(x).Concat(x.Descendants));
+            get => Children.SelectMany(x => x.Descendants.Prepend(x));
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Amp.Linq
         /// </summary>
         public IQueryable<TreeElement<T>> DescendantsAndSelf
         {
-            get => TreeQueryable.SingleQueryable(this).Concat(Descendants);
+            get => Descendants.Prepend(this);
         }
 
 
@@ -85,7 +85,7 @@ namespace Amp.Linq
         public IQueryable<TreeElement<T>> Preceding
         {
             get => PrecedingSiblings.SelectMany(x=>x.DescendantsAndSelf.Reverse())
-                       .Concat(Ancestors.SelectMany(x => TreeQueryable.SingleQueryable(x).Concat(x.PrecedingSiblings.SelectMany(y => y.DescendantsAndSelf.Reverse()))));
+                       .Concat(Ancestors.SelectMany(x => x.PrecedingSiblings.SelectMany(y => y.DescendantsAndSelf.Reverse()).Prepend(x)));
         }
 
         public IQueryable<TreeElement<T>> PrecedingSiblings
@@ -95,7 +95,7 @@ namespace Amp.Linq
 
         public IQueryable<TreeElement<T>> PrecedingSiblingsAndSelf
         {
-            get => TreeQueryable.SingleQueryable(this).Concat(PrecedingSiblings);
+            get => PrecedingSiblings.Prepend(this);
         }           
 
         public TreeElement<T> Root
@@ -128,6 +128,11 @@ namespace Amp.Linq
                 return false;
 
             return EqualityComparer<T>.Default.Equals(Value, other.Value);
+        }
+
+        public static explicit operator T(TreeElement<T> item)
+        {
+            return item?.Value;
         }
     }
 }

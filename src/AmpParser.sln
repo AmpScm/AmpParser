@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A4224779-C3DA-4B7C-A402-E0B41F27050A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmpTokenizer", "AmpTokenizer\AmpTokenizer.csproj", "{B06A5B0F-DE5D-46E9-8166-50E470A06B2A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmpSqlParser", "AmpSqlParser\AmpSqlParser.csproj", "{92F17413-3890-4D73-A688-21B9F220C48D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmpSqlParser.Tests", "AmpSqlParser.Tests\AmpSqlParser.Tests.csproj", "{10765CBE-65BD-47FE-9CD5-4AC3D61534B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmpParser", "AmpParser\AmpParser.csproj", "{172266F1-6C6B-41D6-9B92-213416D694DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmpParser.Tests", "AmpParser.Tests\AmpParser.Tests.csproj", "{79BF518A-1E9F-4091-8D97-4D6EE9894610}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B06A5B0F-DE5D-46E9-8166-50E470A06B2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B06A5B0F-DE5D-46E9-8166-50E470A06B2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B06A5B0F-DE5D-46E9-8166-50E470A06B2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B06A5B0F-DE5D-46E9-8166-50E470A06B2A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{92F17413-3890-4D73-A688-21B9F220C48D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{92F17413-3890-4D73-A688-21B9F220C48D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92F17413-3890-4D73-A688-21B9F220C48D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,6 +27,14 @@ Global
 		{10765CBE-65BD-47FE-9CD5-4AC3D61534B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10765CBE-65BD-47FE-9CD5-4AC3D61534B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10765CBE-65BD-47FE-9CD5-4AC3D61534B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{172266F1-6C6B-41D6-9B92-213416D694DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{172266F1-6C6B-41D6-9B92-213416D694DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{172266F1-6C6B-41D6-9B92-213416D694DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{172266F1-6C6B-41D6-9B92-213416D694DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79BF518A-1E9F-4091-8D97-4D6EE9894610}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79BF518A-1E9F-4091-8D97-4D6EE9894610}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79BF518A-1E9F-4091-8D97-4D6EE9894610}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79BF518A-1E9F-4091-8D97-4D6EE9894610}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

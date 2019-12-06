@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using AmpTokenizer;
+using Amp.Tokenizer;
 
-namespace AmpSqlParser
+namespace Amp.SqlParser
 {
     public enum SqlTriviaKind
     {

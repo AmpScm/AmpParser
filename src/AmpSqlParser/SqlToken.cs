@@ -4,17 +4,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using AmpTokenizer;
+using Amp.Parser;
+using Amp.Tokenizer;
 
-namespace AmpSqlParser
+namespace Amp.SqlParser
 {
     public class SqlToken : AmpToken<SqlKind>
     {
         readonly SqlTrivia[] _leading, _trailing;
         readonly string _value;
-        readonly SqlPosition _position;
+        readonly SqlPosition _startPosition, _endPosition;
 
-        public SqlToken(SqlKind kind, string value, SqlPosition position, IEnumerable<SqlTrivia> leading, IEnumerable<SqlTrivia> trailing)
+        public SqlToken(SqlKind kind, string value, SqlPosition startPosition, SqlPosition endPosition, IEnumerable<SqlTrivia> leading, IEnumerable<SqlTrivia> trailing)
             : base(kind)
         {
             if (leading?.Any() ?? false)
@@ -23,12 +24,13 @@ namespace AmpSqlParser
                 _trailing = trailing.ToArray();
 
             _value = value;
-            _position = position;
+            _startPosition = startPosition;
+            _endPosition = endPosition;
         }
 
         public override AmpRange GetRange(bool includeTrivia)
         {
-            return new AmpRange(_position, _position);
+            return new AmpRange(_startPosition, _endPosition);
         }
         
         public new IEnumerable<SqlTrivia> LeadingTrivia => _leading ?? Enumerable.Empty<SqlTrivia>();

@@ -5,7 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace AmpTokenizer
+namespace Amp.Tokenizer
 {
     [DebuggerDisplay("{ToString()}")]
     public abstract class AmpTrivia : IFormattable

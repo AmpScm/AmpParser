@@ -6,7 +6,7 @@ using System.Text;
 using Amp.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace AmpSqlParser.Tests.Linq
+namespace AmpParser.Tests.Linq
 {
     [TestClass]
     public class TreeLinqTests

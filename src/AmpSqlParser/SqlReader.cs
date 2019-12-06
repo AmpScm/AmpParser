@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AmpTokenizer;
+using Amp.Parser;
+using Amp.Tokenizer;
 
-namespace AmpSqlParser
+namespace Amp.SqlParser
 {
-    public class SqlReader : AmpReader
+    public class SqlReader : IDisposable
     {
         int _lastC;
         int _line, _column;
@@ -14,30 +15,25 @@ namespace AmpSqlParser
 
         public TextReader Reader { get; }
 
-        public SqlReader(TextReader reader, AmpSource source)
-            : base(source)
+        public SqlSource Source { get; }
+
+        public SqlReader(TextReader reader, SqlSource source)
         {
             Reader = reader ?? throw new ArgumentNullException(nameof(reader));
+            Source = source ?? throw new ArgumentNullException(nameof(source));
             _lastC = -1;
         }
 
-        public override AmpPosition GetPosition()
+        public SqlPosition GetPosition()
         {
-            return new AmpPosition(Source, _line, _column);
+            return new SqlPosition(Source, _line, _column);
         }
 
-        protected override void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            try
+            if (disposing)
             {
-                if (disposing)
-                {
-                    Reader.Dispose();
-                }
-            }
-            finally
-            {
-                base.Dispose(disposing);
+                Reader.Dispose();
             }
         }
 
@@ -56,12 +52,12 @@ namespace AmpSqlParser
                 return _peek.ElementAt(depth);
         }
 
-        public override int Peek()
+        public int Peek()
         {
             return Peek(0);
         }
 
-        public override int Read()
+        public int Read()
         {
             int c;
 
@@ -99,6 +95,11 @@ namespace AmpSqlParser
                 return Reader.Read(); // Return just the '\n' of "\r\n"
 
             return c;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }

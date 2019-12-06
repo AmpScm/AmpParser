@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Amp.Parser;
 
-namespace AmpTokenizer
+namespace Amp.Tokenizer
 {
     [DebuggerDisplay("Token: {Token}")]
     public class AmpTokenItem<TToken, TKind>

@@ -2,19 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Amp.Parser;
 
-namespace AmpTokenizer
+namespace Amp.Tokenizer
 {
     public abstract class AmpTokenizer<TToken, TKind> : IEnumerable<AmpTokenItem<TToken, TKind>>, IDisposable
         where TToken : AmpToken<TKind>
         where TKind : struct, Enum
     {
-        protected AmpTokenizer(AmpReader reader)
+        protected AmpTokenizer()
         {
-            Reader = reader ?? throw new ArgumentNullException(nameof(reader));
         }
-
-        protected AmpReader Reader { get; }
 
         IEnumerator<AmpTokenItem<TToken, TKind>> IEnumerable<AmpTokenItem<TToken, TKind>>.GetEnumerator()
         {
@@ -36,7 +34,7 @@ namespace AmpTokenizer
                 return new AmpTokenStream<TToken, TKind>(null, this);
         }
 
-        IEnumerator<TToken> _getTokens;        
+        IEnumerator<TToken> _getTokens;
 
         internal bool ReadNext(out TToken nextToken)
         {
@@ -68,7 +66,6 @@ namespace AmpTokenizer
         {
             if (disposing)
             {
-                Reader.Dispose();
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -14,17 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AmpSqlParser\AmpSqlParser.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="sql-files\Oracle\Queries\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="sql-files\**\*.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\AmpParser\AmpParser.csproj" />
   </ItemGroup>
 
 </Project>

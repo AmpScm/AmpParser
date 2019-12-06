@@ -49,7 +49,17 @@ namespace Amp.Linq
             where T : class, ITree<T>
         => item.AsTree().PrecedingSiblingsAndSelf;
 
+#if prenetstandard21
+        internal static IQueryable<TSource> Prepend<TSource>(this IQueryable<TSource> source, TSource element)
+        {
+            return SingleQueryable(element).Concat(source);
+        }
 
+        internal static IQueryable<TSource> Append<TSource>(this IQueryable<TSource> source, TSource element)
+        {
+            return source.Concat(SingleQueryable(element));
+        }
+#endif
 
         public static IQueryable<T> SingleQueryable<T>(T item)
         {
