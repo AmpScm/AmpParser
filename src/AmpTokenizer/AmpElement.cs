@@ -15,6 +15,9 @@ namespace AmpTokenizer
 
         }
 
+        /// <summary>
+        /// Gets the syntax/token kind
+        /// </summary>
         public TKind Kind { get; protected set; }
 
         protected int KindValue
@@ -51,6 +54,11 @@ namespace AmpTokenizer
         public abstract void WriteTo(TextWriter tw, IFormatProvider formatProvider, string format, bool leading, bool following);
 
         public abstract AmpRange GetRange(bool includeTrivia);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual bool IsError => false;
     }
 
     sealed class AmpKindConverter<TKind> where TKind : Enum
