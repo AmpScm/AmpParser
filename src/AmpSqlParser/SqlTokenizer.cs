@@ -63,7 +63,7 @@ namespace AmpSqlParser
                         kind = (c == '\'') ? SqlKind.StringToken : SqlKind.QuotedIdentifierToken;
                         break;
                     case '!' when Reader.Peek() == '=':
-                    case '^' when Reader.Peek() == '=' && Dialect == SqlDialect.Oracle:
+                    case '^' when Reader.Peek() == '=' && IsOracle:
                     case '<' when Reader.Peek() == '>':
                         Buffer.Append(c);
                         Buffer.Append((char)Reader.Read());
@@ -132,17 +132,17 @@ namespace AmpSqlParser
                         Buffer.Append(')');
                         kind = SqlKind.CloseParenToken;
                         break;
-                    case '=' when Reader.Peek() == '=' && Dialect == SqlDialect.SqLite:
+                    case '=' when Reader.Peek() == '=' && IsSqlite:
                         Buffer.Append(c);
                         Buffer.Append((char)Reader.Read());
                         kind = SqlKind.EqualOperatorToken;
                         break;
-                    case '=' when Reader.Peek() == '>' && Dialect == SqlDialect.Oracle:
+                    case '=' when Reader.Peek() == '>' && IsOracle:
                         Buffer.Append(c);
                         Buffer.Append((char)Reader.Read());
                         kind = SqlKind.GreaterThanOrEqualToken;
                         break;
-                    case '=' when Reader.Peek() == '<' && Dialect == SqlDialect.Oracle:
+                    case '=' when Reader.Peek() == '<' && IsOracle:
                         Buffer.Append(c);
                         Buffer.Append((char)Reader.Read());
                         kind = SqlKind.LessThanOrEqualToken;
@@ -201,7 +201,7 @@ namespace AmpSqlParser
                             Buffer.Append(c);
 
                             while ((cR = Reader.Peek()) > 0
-                                && (char.IsLetterOrDigit((char)cR) || cR == '_') || (cR == '$' && Dialect == SqlDialect.Oracle))
+                                && (char.IsLetterOrDigit((char)cR) || cR == '_') || (cR == '$' && IsOracle))
                             {
                                 Buffer.Append((char)Reader.Read());
                             }
@@ -216,15 +216,19 @@ namespace AmpSqlParser
 
                             while ((cR = Reader.Peek()) > 0
                                   && (char.IsDigit((char)cR)
-                                      || (cR == 'E' && !gotE)
-                                      || (cR == 'e' && !gotE)
+                                      || (cR == 'E' && !gotE && NumberFollows(1))
+                                      || (cR == 'e' && !gotE && NumberFollows(1))
                                       || (cR == '.' && !gotE && !gotDot)))
                             {
                                 Buffer.Append((char)Reader.Read());
                                 if (cR == '.')
                                     gotDot = true;
                                 else if (cR == 'E' || cR == 'e')
+                                {
                                     gotE = true;
+                                    if (Reader.Peek() == '-')
+                                        Buffer.Append((char)Reader.Read());
+                                }
                             }
 
                             kind = (gotDot || gotE) ? SqlKind.DoubleValueToken : SqlKind.IntValueToken;
@@ -243,6 +247,17 @@ namespace AmpSqlParser
 
                 yield return new SqlToken(kind, text, new SqlPosition(start), leadingTrivia, trailingTrivia);
             }
+        }
+
+        private bool NumberFollows(int v)
+        {
+            int c = Reader.Peek(v);
+            if (c >= 0 && char.IsDigit((char)c))
+                return true;
+            else if (c != '-')
+                return false;
+            else
+                return (Reader.Peek(v + 1) >= 0 && char.IsDigit((char)Reader.Peek(v + 1)));
         }
 
         private void ScanLeadingTrivia(ref int cR, out List<SqlTrivia> leadingTrivia)
@@ -407,6 +422,8 @@ namespace AmpSqlParser
         }
 
         bool IsOracle => (Dialect == SqlDialect.Oracle);
+        bool IsSqlServer => (Dialect == SqlDialect.SqlServer);
+        bool IsSqlite => (Dialect == SqlDialect.SqLite);
 
         protected override SqlKind? TokenForIdentifier(string value)
         {
@@ -1008,20 +1025,175 @@ namespace AmpSqlParser
                 case "ZONE": // when IsSql1999:
                     return SqlKind.ZoneToken;
 
-
-                case "BETWEEN":
+                // SQLServer 2019
+                case "FILE" when IsSqlServer:
+                    return SqlKind.FileToken;
+                case "RAISERROR" when IsSqlServer:
+                    return SqlKind.RaiseErrorToken;
+                case "FILLFACTOR" when IsSqlServer:
+                    return SqlKind.FillFactorToken;
+                case "READTEXT" when IsSqlServer:
+                    return SqlKind.ReadTextToken;
+                case "RECONFIGURE" when IsSqlServer:
+                    return SqlKind.ReconfigureToken;
+                case "FREETEXT" when IsSqlServer:
+                    return SqlKind.FreeTextToken;
+                case "FREETEXTTABLE" when IsSqlServer:
+                    return SqlKind.FreeTextTableToken;
+                case "REPLICATION" when IsSqlServer:
+                    return SqlKind.ReplicationToken;
+                case "BACKUP" when IsSqlServer:
+                    return SqlKind.BackupToken;
+                case "RESTORE" when IsSqlServer:
+                    return SqlKind.RestoreToken;
+                case "BETWEEN" when IsSqlServer:
                     return SqlKind.BetweenToken;
-                case "EXISTS":
+                case "BREAK" when IsSqlServer:
+                    return SqlKind.BreakToken;
+                case "REVERT" when IsSqlServer:
+                    return SqlKind.RevertToken;
+                case "BROWSE" when IsSqlServer:
+                    return SqlKind.BrowseToken;
+                case "BULK" when IsSqlServer:
+                    return SqlKind.BulkToken;
+                case "HOLDLOCK" when IsSqlServer:
+                    return SqlKind.HoldLockToken;
+                case "ROWCOUNT" when IsSqlServer:
+                    return SqlKind.RowCountToken;
+                case "ROWGUIDCOL" when IsSqlServer:
+                    return SqlKind.RowGuidColToken;
+                case "IDENTITY_INSERT" when IsSqlServer:
+                    return SqlKind.IdentityInsertToken;
+                case "RULE" when IsSqlServer:
+                    return SqlKind.RuleToken;
+                case "CHECKPOINT" when IsSqlServer:
+                    return SqlKind.CheckpointToken;
+                case "IDENTITYCOL" when IsSqlServer:
+                    return SqlKind.IdentityColToken;
+                case "SAVE" when IsSqlServer:
+                    return SqlKind.SaveToken;
+                case "IF" when IsSqlServer:
+                    return SqlKind.IfToken;
+                case "CLUSTERED" when IsSqlServer:
+                    return SqlKind.ClusteredToken;
+                case "SECURITYAUDIT" when IsSqlServer:
+                    return SqlKind.SecurityAuditToken;
+                case "COALESCE" when IsSqlServer:
+                    return SqlKind.CoalesceToken;
+                case "INDEX" when IsSqlServer:
+                    return SqlKind.IndexToken;
+                case "SEMANTICKEYPHRASETABLE" when IsSqlServer:
+                    return SqlKind.SemanticKeyPhraseTableToken;
+                case "SEMANTICSIMILARITYDETAILSTABLE" when IsSqlServer:
+                    return SqlKind.SemanticSimilarityDetailsTableToken;
+                case "SEMANTICSIMILARITYTABLE" when IsSqlServer:
+                    return SqlKind.SemanticSimilarityTableToken;
+                case "COMPUTE" when IsSqlServer:
+                    return SqlKind.ComputeToken;
+                case "CONTAINS" when IsSqlServer:
+                    return SqlKind.ContainsToken;
+                case "SETUSER" when IsSqlServer:
+                    return SqlKind.SetUserToken;
+                case "CONTAINSTABLE" when IsSqlServer:
+                    return SqlKind.ContainsTableToken;
+                case "SHUTDOWN" when IsSqlServer:
+                    return SqlKind.ShutdownToken;
+                case "KILL" when IsSqlServer:
+                    return SqlKind.KillToken;
+                case "CONVERT" when IsSqlServer:
+                    return SqlKind.ConvertToken;
+                case "STATISTICS" when IsSqlServer:
+                    return SqlKind.StatisticsToken;
+                case "LINENO" when IsSqlServer:
+                    return SqlKind.LineNoToken;
+                case "LOAD" when IsSqlServer:
+                    return SqlKind.LoadToken;
+                case "TABLESAMPLE" when IsSqlServer:
+                    return SqlKind.TableSampleToken;
+                case "MERGE" when IsSqlServer:
+                    return SqlKind.MergeToken;
+                case "TEXTSIZE" when IsSqlServer:
+                    return SqlKind.TextSizeToken;
+                case "NOCHECK" when IsSqlServer:
+                    return SqlKind.NoCheckToken;
+                case "NONCLUSTERED" when IsSqlServer:
+                    return SqlKind.NonClusteredToken;
+                case "TOP" when IsSqlServer:
+                    return SqlKind.TopToken;
+                case "TRAN" when IsSqlServer:
+                    return SqlKind.TranToken;
+                case "DATABASE" when IsSqlServer:
+                    return SqlKind.DatabaseToken;
+                case "DBCC" when IsSqlServer:
+                    return SqlKind.DbccToken;
+                case "NULLIF" when IsSqlServer:
+                    return SqlKind.NullIfToken;
+                case "TRUNCATE" when IsSqlServer:
+                    return SqlKind.TruncateToken;
+                case "TRY_CONVERT" when IsSqlServer:
+                    return SqlKind.TryConvertToken;
+                case "OFFSETS" when IsSqlServer:
+                    return SqlKind.OffsetsToken;
+                case "TSEQUAL" when IsSqlServer:
+                    return SqlKind.TSequalToken;
+                case "DENY" when IsSqlServer:
+                    return SqlKind.DenyToken;
+                case "OPENDATASOURCE" when IsSqlServer:
+                    return SqlKind.OpenDataSourceToken;
+                case "UNPIVOT" when IsSqlServer:
+                    return SqlKind.UniPivotToken;
+                case "DISK" when IsSqlServer:
+                    return SqlKind.DiskToken;
+                case "OPENQUERY" when IsSqlServer:
+                    return SqlKind.OpenQueryToken;
+                case "OPENROWSET" when IsSqlServer:
+                    return SqlKind.OpenRowSetToken;
+                case "UPDATETEXT" when IsSqlServer:
+                    return SqlKind.UpdateTextToken;
+                case "DISTRIBUTED" when IsSqlServer:
+                    return SqlKind.DistributedToken;
+                case "OPENXML" when IsSqlServer:
+                    return SqlKind.OpenXmlToken;
+                case "USE" when IsSqlServer:
+                    return SqlKind.UseToken;
+                case "DUMP" when IsSqlServer:
+                    return SqlKind.DumpToken;
+                case "OVER" when IsSqlServer:
+                    return SqlKind.OverToken;
+                case "WAITFOR" when IsSqlServer:
+                    return SqlKind.WaitForToken;
+                case "ERRLVL" when IsSqlServer:
+                    return SqlKind.ErrorLvlToken;
+                case "PERCENT" when IsSqlServer:
+                    return SqlKind.PercentToken;
+                case "PIVOT" when IsSqlServer:
+                    return SqlKind.PivotToken;
+                case "PLAN" when IsSqlServer:
+                    return SqlKind.PlanToken;
+                case "WHILE" when IsSqlServer:
+                    return SqlKind.WhileToken;
+                case "EXEC" when IsSqlServer:
+                    return SqlKind.ExecToken;
+                case "WITHIN" when IsSqlServer:
+                    return SqlKind.WithinToken;
+                case "EXISTS" when IsSqlServer:
                     return SqlKind.ExistsToken;
-                case "COUNT":
-                    return SqlKind.CountToken;
-                case "TRUNC":
-                    return SqlKind.TruncToken;
-                case "INDEX":
+                case "PRINT" when IsSqlServer:
+                    return SqlKind.PrintToken;
+                case "WRITETEXT" when IsSqlServer:
+                    return SqlKind.WriteTextToken;
+                case "EXIT" when IsSqlServer:
+                    return SqlKind.ExitToken;
+
+                case "BETWEEN" when IsOracle:
+                    return SqlKind.BetweenToken;
+                case "EXISTS" when IsOracle:
+                    return SqlKind.ExistsToken;
+                case "INDEX" when IsOracle:
                     return SqlKind.IndexToken;
 
                 // Generic?
-                case "SYSDATE":
+                case "SYSDATE" when IsOracle:
                     return SqlKind.SysDateToken;
                 // ORACLE
                 case "MINUS" when IsOracle:
@@ -1029,8 +1201,9 @@ namespace AmpSqlParser
                 case "REPLACE" when IsOracle:
                     return SqlKind.ReplaceToken;
 
-                case "EDITIONABLE" when Dialect == SqlDialect.Oracle:
+                case "EDITIONABLE" when IsOracle:
 
+                // O
                 case "ACCESS" when IsOracle:
                     return SqlKind.AccessToken;
                 case "EXCLUSIVE" when IsOracle:
@@ -1107,6 +1280,101 @@ namespace AmpSqlParser
                 case "MODE" when IsOracle:
                     return SqlKind.ModeToken;
 
+
+                case "ABORT" when IsSqlite:
+                    return SqlKind.AbortToken;
+                case "ANALYZE" when IsSqlite:
+                    return SqlKind.AnalyzeToken;
+                case "ATTACH" when IsSqlite:
+                    return SqlKind.AttachToken;
+                case "AUTOINCREMENT" when IsSqlite:
+                    return SqlKind.AutoIncrementToken;
+                case "BETWEEN" when IsSqlite:
+                    return SqlKind.BetweenToken;
+                case "CONFLICT" when IsSqlite:
+                    return SqlKind.ConflictToken;
+                case "DATABASE" when IsSqlite:
+                    return SqlKind.DatabaseToken;
+                case "DETACH" when IsSqlite:
+                    return SqlKind.DetachToken;
+                case "DO" when IsSqlite:
+                    return SqlKind.DoToken;
+                case "EXCLUDE" when IsSqlite:
+                    return SqlKind.ExcludeToken;
+                case "EXCLUSIVE" when IsSqlite:
+                    return SqlKind.ExclusiveToken;
+                case "EXISTS" when IsSqlite:
+                    return SqlKind.ExistsToken;
+                case "EXPLAIN" when IsSqlite:
+                    return SqlKind.ExplainToken;
+                case "FAIL" when IsSqlite:
+                    return SqlKind.FailToken;
+                case "FILTER" when IsSqlite:
+                    return SqlKind.FilterToken;
+                case "FOLLOWING" when IsSqlite:
+                    return SqlKind.FollowingToken;
+                case "GLOB" when IsSqlite:
+                    return SqlKind.GlobToken;
+                case "GROUPS" when IsSqlite:
+                    return SqlKind.GroupsToken;
+                case "IF" when IsSqlite:
+                    return SqlKind.IfToken;
+                case "INDEX" when IsSqlite:
+                    return SqlKind.IndexToken;
+                case "INDEXED" when IsSqlite:
+                    return SqlKind.IndexedToken;
+                case "INSTEAD" when IsSqlite:
+                    return SqlKind.InsteadToken;
+                case "ISNULL" when IsSqlite:
+                    return SqlKind.IsNullToken;
+                case "NOTHING" when IsSqlite:
+                    return SqlKind.NothingToken;
+                case "NOTNULL" when IsSqlite:
+                    return SqlKind.NotNullToken;
+                case "NULLS" when IsSqlite:
+                    return SqlKind.NullsToken;
+                case "OFFSET" when IsSqlite:
+                    return SqlKind.OffsetToken;
+                case "OTHERS" when IsSqlite:
+                    return SqlKind.OthersToken;
+                case "OVER" when IsSqlite:
+                    return SqlKind.OverToken;
+                case "PARTITION" when IsSqlite:
+                    return SqlKind.PartitionToken;
+                case "PLAN" when IsSqlite:
+                    return SqlKind.PlanToken;
+                case "PRAGMA" when IsSqlite:
+                    return SqlKind.PragmaToken;
+                case "PRECEDING" when IsSqlite:
+                    return SqlKind.PrecedingToken;
+                case "QUERY" when IsSqlite:
+                    return SqlKind.QueryToken;
+                case "RAISE" when IsSqlite:
+                    return SqlKind.RaiseToken;
+                case "RANGE" when IsSqlite:
+                    return SqlKind.RangeToken;
+                case "REGEXP" when IsSqlite:
+                    return SqlKind.RegExpToken;
+                case "REINDEX" when IsSqlite:
+                    return SqlKind.ReIndexToken;
+                case "RELEASE" when IsSqlite:
+                    return SqlKind.ReleaseToken;
+                case "RENAME" when IsSqlite:
+                    return SqlKind.RenameToken;
+                case "REPLACE" when IsSqlite:
+                    return SqlKind.ReplaceToken;
+                case "TEMP" when IsSqlite:
+                    return SqlKind.TempToken;
+                case "TIES" when IsSqlite:
+                    return SqlKind.TiesToken;
+                case "UNBOUNDED" when IsSqlite:
+                    return SqlKind.UnboundedToken;
+                case "VACUUM" when IsSqlite:
+                    return SqlKind.VacuumToken;
+                case "VIRTUAL" when IsSqlite:
+                    return SqlKind.VirtualToken;
+                case "WINDOW" when IsSqlite:
+                    return SqlKind.WindowToken;
                 default:
                     return null;
             }

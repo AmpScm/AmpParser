@@ -10,13 +10,13 @@ using K = AmpSqlParser.SqlKind;
 namespace AmpSqlParser.Tests
 {
     [TestClass]
-    public class ParserTests
+    public class TokenizerTests
     {
         public TestContext TestContext { get; set; }
         [TestMethod]
         public void ScanAll()
         {
-            DirectoryInfo dir = new DirectoryInfo(Path.Combine(Path.GetDirectoryName(typeof(ParserTests).Assembly.Location), "sql-files"));
+            DirectoryInfo dir = new DirectoryInfo(Path.Combine(Path.GetDirectoryName(typeof(TokenizerTests).Assembly.Location), "sql-files"));
 
             foreach (FileInfo fi in dir.GetFiles("*.sql", SearchOption.AllDirectories))
             {
@@ -57,7 +57,8 @@ namespace AmpSqlParser.Tests
         [TestMethod]
         public void TestQueryWithJoin()
         {
-            using (StringReader sr = new StringReader(@"
+            string expected;
+            using (StringReader sr = new StringReader(expected = @"
                     SELECT * From MyTable m
                     LEFT JOIN OtherTable o on m.OtherId = o.Id
                     WHERE q=r and s=1
@@ -67,7 +68,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -80,6 +81,7 @@ namespace AmpSqlParser.Tests
                     K.OrderToken, K.ByToken, K.IdentifierToken},
                     kinds);
 
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
             }
         }
 
@@ -95,7 +97,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.Select(x=>x.Token).ToArray().AsQueryable();
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -251,7 +253,7 @@ namespace AmpSqlParser.Tests
                     K.SelectToken, K.IntValueToken},
                     kinds);
 
-                Assert.AreEqual(expected.Replace("\r",""), string.Join("", tokens.Select(x => x.ToFullString())));
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
             }
         }
 
@@ -297,6 +299,44 @@ namespace AmpSqlParser.Tests
 
                 ParseAssert.AreEqual(new SqlKind[] {
                     K.SelectToken, K.IntValueToken, K.EndOfStream},
+                    kinds);
+
+                Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+        [TestMethod]
+        public void TestSomeOps()
+        {
+            string expected;
+
+            using (StringReader sr = new StringReader(expected = @"
+                    SELECT 1+2.5*3.4E5/4.5e-6, case when 8=9 then :p5 else 'qq' end--QQ
+                    FROM DUAL--R"))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                tk.Dialect = SqlDialect.Oracle;
+
+                var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                Assert.AreEqual(22, kinds.Length);
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    K.SelectToken,
+                        K.IntValueToken,  K.PlusOperatorToken,
+                        K.DoubleValueToken, K.AsteriksToken,
+                        K.DoubleValueToken, K.DivToken,
+                        K.DoubleValueToken, K.CommaToken,
+                        K.CaseToken, K.WhenToken,
+                        K.IntValueToken, K.EqualOperatorToken,
+                        K.IntValueToken,
+                        K.ThenToken,
+                        K.ColonOperatorToken, K.IdentifierToken,
+                        K.ElseToken, K.StringToken, K.EndToken,
+                    K.FromToken, K.IdentifierToken},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));

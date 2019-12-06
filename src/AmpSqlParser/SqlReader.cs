@@ -96,7 +96,7 @@ namespace AmpSqlParser
             int c= Reader.Read();
 
             if (c == '\r' && Reader.Peek() == '\n')
-                return Reader.Read(); // Return just the '\n
+                return Reader.Read(); // Return just the '\n' of "\r\n"
 
             return c;
         }

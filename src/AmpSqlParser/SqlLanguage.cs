@@ -10,5 +10,6 @@ namespace AmpSqlParser
         Sql1999,
         Oracle,
         SqLite,
+        SqlServer,
     }
 }
