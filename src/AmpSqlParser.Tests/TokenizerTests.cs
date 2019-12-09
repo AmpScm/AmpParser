@@ -347,7 +347,7 @@ namespace AmpSqlParser.Tests
         [TestMethod]
         public void TestIdentifier()
         {
-            for(SqlDialect dialect = SqlDialect.None; dialect <= SqlDialect.SqlServer; dialect++)
+            foreach (SqlDialect dialect in Enum.GetValues(typeof(SqlDialect)))
             {
                 string expected;
 
@@ -431,7 +431,6 @@ namespace AmpSqlParser.Tests
 
                         Assert.AreEqual("[aa", tokens.Last().ToString());
                         Assert.IsTrue(tokens.Last().IsError);
-                        Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
                     }
                     else
                     {
@@ -443,8 +442,8 @@ namespace AmpSqlParser.Tests
 
                         Assert.AreEqual("aa", tokens.Last().ToString());
                         Assert.IsFalse(tokens.Last().IsError);
-                        Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
                     }
+                    Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
                 }
 
                 using (StringReader sr = new StringReader(expected = @"SELECT [aa]"))
@@ -467,7 +466,6 @@ namespace AmpSqlParser.Tests
 
                         Assert.AreEqual("[aa]", tokens.Last().ToString());
                         Assert.IsFalse(tokens.Last().IsError);
-                        Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
                     }
                     else
                     {
@@ -479,8 +477,88 @@ namespace AmpSqlParser.Tests
 
                         Assert.AreEqual("aa", tokens.Reverse().Skip(1).First().ToString());
                         Assert.IsFalse(tokens.Last().IsError);
-                        Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
                     }
+                    Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                }
+            }
+        }
+
+        [TestMethod]
+        public void LegacyJoin()
+        {
+            foreach (SqlDialect dialect in Enum.GetValues(typeof(SqlDialect)))
+            {
+                string expected;
+
+                using (StringReader sr = new StringReader(expected = @"SELECT a from A, B WHERE a.Id(+) = b.Id"))
+                using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+                using (SqlTokenizer tk = new SqlTokenizer(rdr))
+                {
+                    tk.Dialect = dialect;
+                    var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+                    var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                    if (dialect != SqlDialect.Oracle)
+                    {
+                        Assert.AreEqual(17, kinds.Length);
+
+                        ParseAssert.AreEqual(new SqlKind[] {
+                            K.SelectToken, K.IdentifierToken, K.FromToken, K.IdentifierToken,
+                            K.CommaToken,
+                            K.IdentifierToken,
+                            K.WhereToken, K.IdentifierToken, K.DotToken, K.IdentifierToken,
+                            //
+                            K.OpenParenToken, K.PlusOperatorToken, K.CloseParenToken,
+                            //
+                            K.EqualOperatorToken,
+                            K.IdentifierToken, K.DotToken, K.IdentifierToken
+                        },
+                        kinds);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(15, kinds.Length);
+
+                        ParseAssert.AreEqual(new SqlKind[] {
+                        K.SelectToken, K.IdentifierToken, K.FromToken, K.IdentifierToken,
+                        K.CommaToken,
+                        K.IdentifierToken,
+                        K.WhereToken, K.IdentifierToken, K.DotToken, K.IdentifierToken,
+                        //
+                        K.OuterJoinToken,
+                        //
+                        K.EqualOperatorToken,
+                        K.IdentifierToken, K.DotToken, K.IdentifierToken
+                        },
+                        kinds);
+                    }
+
+                    Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
+                }
+
+
+                using (StringReader sr = new StringReader(expected = @"SELECT a from A, B WHERE a.Id(+ = b.Id"))
+                using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+                using (SqlTokenizer tk = new SqlTokenizer(rdr))
+                {
+                    tk.Dialect = dialect;
+                    var tokens = tk.Select(x => x.Token).ToArray().AsQueryable();
+                    var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                    Assert.AreEqual(16, kinds.Length);
+
+                    ParseAssert.AreEqual(new SqlKind[] {
+                            K.SelectToken, K.IdentifierToken, K.FromToken, K.IdentifierToken,
+                            K.CommaToken,
+                            K.IdentifierToken,
+                            K.WhereToken, K.IdentifierToken, K.DotToken, K.IdentifierToken,
+                            //
+                            K.OpenParenToken, K.PlusOperatorToken,
+                            //
+                            K.EqualOperatorToken,
+                            K.IdentifierToken, K.DotToken, K.IdentifierToken
+                        },
+                    kinds);
                 }
             }
         }

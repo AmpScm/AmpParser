@@ -13,21 +13,24 @@ namespace Amp.Linq
         public TreeElement(T item)
         {
             Value = item;
-            Ancestors = TreeQueryable.EmptyQueryable<TreeElement<T>>();
+            Ancestors = AmpQueryable.EmptyQueryable<TreeElement<T>>();
         }
 
         public TreeElement(T item, IQueryable<TreeElement<T>> ancestors)
         {
             Value = item;
-            Ancestors = ancestors ?? TreeQueryable.EmptyQueryable<TreeElement<T>>();
+            Ancestors = ancestors ?? AmpQueryable.EmptyQueryable<TreeElement<T>>();
         }
 
-        public T Value { get; }
+        private TreeElement()
+        { } // Used by .Children to allow introspection via Linq
+
+        public T Value { get; private set; }
 
         /// <summary>
         /// Enumerates the ancestors of the node, starting at the direct parent
         /// </summary>
-        public IQueryable<TreeElement<T>> Ancestors { get; }
+        public IQueryable<TreeElement<T>> Ancestors { get; private set; }
 
         /// <summary>
         /// Enumerates the node itself and its ancestors, starting at the node itself
@@ -39,7 +42,7 @@ namespace Amp.Linq
 
         public IQueryable<TreeElement<T>> Children
         {
-            get => (Value is IEnumerable<T> e) ? e.AsQueryable().Select(x => new TreeElement<T>(x, AncestorsAndSelf)) : TreeQueryable.EmptyQueryable<TreeElement<T>>();
+            get => (Value is IEnumerable<T> e) ? e.AsQueryable().Select(x => new TreeElement<T> { Value = x, Ancestors = AncestorsAndSelf }) : AmpQueryable.EmptyQueryable<TreeElement<T>>();
         }
 
         /// <summary>

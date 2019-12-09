@@ -33,7 +33,7 @@ namespace Amp.SqlParser
                 if (cR < 0)
                 {
                     if (leadingTrivia?.Count > 0)
-                        yield return new SqlToken(SqlKind.EndOfStream, "", Reader.GetPosition(), Reader.GetPosition(), leadingTrivia, trailing: null);
+                        yield return new SqlToken(SqlKind.EndOfStream, "", Reader.GetPosition(), leadingTrivia, trailing: null);
                     yield break;
                 }
 
@@ -148,6 +148,12 @@ namespace Amp.SqlParser
                         Buffer.Append('.');
                         kind = SqlKind.DotToken;
                         break;
+                    case '(' when IsOracle && Reader.Peek() == '+' && Reader.Peek(1) == ')':
+                        Reader.Read(); // '+'
+                        Reader.Read(); // ')'
+                        Buffer.Append("(+)");                        
+                        kind = SqlKind.OuterJoinToken;
+                        break;
                     case '(':
                         Buffer.Append('(');
                         kind = SqlKind.OpenParenToken;
@@ -156,12 +162,12 @@ namespace Amp.SqlParser
                         Buffer.Append(')');
                         kind = SqlKind.CloseParenToken;
                         break;
-                    case '=' when Reader.Peek() == '=' && IsSqlite:
+                    case '=' when IsSqlServer && Reader.Peek() == '=':
                         Buffer.Append(c);
                         Buffer.Append((char)Reader.Read());
                         kind = SqlKind.EqualOperatorToken;
                         break;
-                    case '=' when Reader.Peek() == '>' && IsOracle:
+                    case '=' when IsOracle && Reader.Peek() == '>':
                         Buffer.Append(c);
                         Buffer.Append((char)Reader.Read());
                         kind = SqlKind.GreaterThanOrEqualToken;
@@ -270,7 +276,7 @@ namespace Amp.SqlParser
                 var end = Reader.GetPosition();
                 ScanTrailingTrivia(out var trailingTrivia);
 
-                yield return new SqlToken(kind, text, start, end, leadingTrivia, trailingTrivia)
+                yield return new SqlToken(kind, text, start, leadingTrivia, trailingTrivia)
                 {
                     IsError = IsErrorKind(kind)
                 };

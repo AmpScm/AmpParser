@@ -503,5 +503,6 @@ namespace Amp.SqlParser
         WindowToken,
         IncompleteStringToken,
         IncompleteQuotedIdentifierToken,
+        OuterJoinToken,
     }
 }

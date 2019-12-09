@@ -6,9 +6,8 @@ using System.Text;
 
 namespace Amp.Linq
 {
-    public static class PeekQueryable
+    public static partial class AmpQueryable
     {
-
         public static IEnumerable<PeekElement<T>> AsPeekable<T>(this IEnumerable<T> source)
         {
             return new PeekWalkable<T>(source);

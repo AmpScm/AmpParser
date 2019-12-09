@@ -20,7 +20,7 @@ namespace Amp.Parser
 
         public virtual AmpPosition Position
         {
-            get => GetRange(false).Start;
+            get => GetRange().Start;
         }
 
         public override void WriteTo(TextWriter tw, IFormatProvider formatProvider, string format, bool leadingTrivia, bool trailingTrivia)

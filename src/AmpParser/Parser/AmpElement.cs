@@ -37,7 +37,7 @@ namespace Amp.Parser
 
         public abstract void WriteTo(TextWriter tw, IFormatProvider formatProvider, string format, bool leading, bool following);
 
-        public abstract AmpRange GetRange(bool includeTrivia);
+        public abstract AmpRange GetRange();
 
         /// <summary>
         /// 
