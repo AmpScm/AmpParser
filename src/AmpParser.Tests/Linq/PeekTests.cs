@@ -23,6 +23,17 @@ namespace AmpParser.Tests.Linq
 
                 Assert.AreEqual(line.Substring(n), string.Join("", p.Peek));
             }
+
+            var pl = line.AsPeekable();
+            pl.Peek.ToArray();
+            n = 0;
+            foreach (var p in pl)
+            {
+                Assert.AreEqual(line[n], p.Value);
+                n++;
+
+                Assert.AreEqual(line.Substring(n), string.Join("", p.Peek));
+            }
         }
 
         [TestMethod]

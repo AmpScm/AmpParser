@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Amp.Linq
 {
+    [DebuggerDisplay("{Value, nq}")]
     public sealed class PeekElement<T>
     {
         Lazy<PeekElement<T>> _peekNext;
@@ -19,24 +21,21 @@ namespace Amp.Linq
         public T Value { get; }
 
 
-        public IEnumerable<PeekElement<T>> Peek
+        internal IEnumerable<PeekElement<T>> GetPeek()
         {
-            get
+            var pn = _peekNext;
+
+            while (pn != null && pn.Value != null)
             {
-                var pn = _peekNext;
+                yield return pn.Value;
 
-                while (pn != null && pn.Value != null)
-                {
-                    yield return pn.Value;
-
-                    pn = pn.Value._peekNext;
-                }
+                pn = pn.Value._peekNext;
             }
         }
 
-        public IEnumerable<T> PeekValue
+        public IEnumerable<T> Peek
         {
-            get => Peek.Select(x => x.Value);
+            get => GetPeek().Select(x => x.Value);
         }
 
         public override string ToString()

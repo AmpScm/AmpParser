@@ -6,54 +6,30 @@ using Amp.Parser;
 
 namespace Amp.Tokenizer
 {
-    public abstract class AmpTokenizer<TToken, TKind> : IEnumerable<AmpTokenItem<TToken, TKind>>, IDisposable
+    public abstract class AmpTokenizer<TToken, TKind> : IEnumerable<TToken>, IDisposable
         where TToken : AmpToken<TKind>
         where TKind : struct, Enum
     {
+        bool _started;
         protected AmpTokenizer()
         {
         }
 
-        IEnumerator<AmpTokenItem<TToken, TKind>> IEnumerable<AmpTokenItem<TToken, TKind>>.GetEnumerator()
+        public IEnumerator<TToken> GetEnumerator()
         {
-            return GetTokenStream();
+            if (_started)
+                throw new InvalidOperationException();
+            _started = true;
+
+            return GetTokens();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetTokenStream();
+            return GetEnumerator();
         }
 
-        public virtual AmpTokenStream<TToken, TKind> GetTokenStream()
-        {
-            if (ReadNext(out var nextToken))
-            {
-                return new AmpTokenStream<TToken, TKind>(new AmpTokenItem<TToken, TKind>(nextToken, this));
-            }
-            else
-                return new AmpTokenStream<TToken, TKind>(null, this);
-        }
-
-        IEnumerator<TToken> _getTokens;
-
-        internal bool ReadNext(out TToken nextToken)
-        {
-            if (_getTokens == null)
-                _getTokens = GetTokens().GetEnumerator();
-
-            if (_getTokens.MoveNext())
-            {
-                nextToken = _getTokens.Current;
-                return true;
-            }
-            else
-            {
-                nextToken = null;
-                return false;
-            }
-        }
-
-        protected abstract IEnumerable<TToken> GetTokens();
+        protected abstract IEnumerator<TToken> GetTokens();
 
         protected abstract TKind? TokenForIdentifier(string value);
 
@@ -68,58 +44,5 @@ namespace Amp.Tokenizer
             {
             }
         }
-    }
-
-    public sealed class AmpTokenStream<TToken, TKind> : IEnumerator<AmpTokenItem<TToken, TKind>>
-        where TToken : AmpToken<TKind>
-        where TKind : struct, Enum
-    {
-        readonly AmpTokenizer<TToken, TKind> _tokenizer;
-        AmpTokenItem<TToken, TKind> _current;
-        bool _started;
-
-        public AmpTokenStream(AmpTokenItem<TToken, TKind> current)
-            : this(current ?? throw new ArgumentNullException(nameof(current)),
-                   current?.Tokenizer)
-        {
-        }
-
-        public AmpTokenStream(AmpTokenItem<TToken, TKind> current, AmpTokenizer<TToken, TKind> tokenizer)
-        {
-            _current = current;
-            _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
-        }
-
-        public AmpTokenItem<TToken, TKind> Current
-        {
-            get => _started ? _current : null;
-        }
-
-        public bool MoveNext()
-        {
-            if (!_started)
-            {
-                _started = true;
-            }
-            else
-                _current = Current.GetNext();
-
-            return (_current != null);
-        }
-
-        #region IEnumerator legacy support
-        object IEnumerator.Current => Current;
-
-#pragma warning disable CA1063 // Implement IDisposable Correctly
-        void IDisposable.Dispose()
-#pragma warning restore CA1063 // Implement IDisposable Correctly
-        {
-        }
-
-        void IEnumerator.Reset()
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
-    }
+    }    
 }

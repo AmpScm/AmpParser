@@ -21,7 +21,7 @@ namespace Amp.SqlParser
 
         public SqlDialect Dialect { get; set; }
 
-        protected override IEnumerable<SqlToken> GetTokens()
+        protected override IEnumerator<SqlToken> GetTokens()
         {
             int cR;
 

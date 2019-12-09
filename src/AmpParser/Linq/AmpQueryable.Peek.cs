@@ -8,18 +8,18 @@ namespace Amp.Linq
 {
     public static partial class AmpQueryable
     {
-        public static IEnumerable<PeekElement<T>> AsPeekable<T>(this IEnumerable<T> source)
+        public static IEnumerableWithPeek<T> AsPeekable<T>(this IEnumerable<T> source)
         {
             return new PeekWalkable<T>(source);
         }
 
-        public static IEnumerable<PeekElement<T>> AsPeekable<T>(this Func<T?> source)
+        public static IEnumerableWithPeek<T> AsPeekable<T>(this Func<T?> source)
             where T :struct
         {
             return AsPeekable(WalkSource(source));
         }
 
-        public static IEnumerable<PeekElement<T>> AsPeekable<T>(this Func<T> source)
+        public static IEnumerableWithPeek<T> AsPeekable<T>(this Func<T> source)
             where T : class
         {
             return AsPeekable(WalkSource2(source));
@@ -45,23 +45,43 @@ namespace Amp.Linq
             }
         }
 
-        sealed class PeekWalkable<T> : IEnumerable<PeekElement<T>>
+        sealed class PeekWalkable<T> : IEnumerable<PeekElement<T>>, IEnumerableWithPeek<T>
         {
             readonly IEnumerable<T> _source;
+            PeekWalker<T> _walker;
 
             public PeekWalkable(IEnumerable<T> source)
             {
                 _source = source ?? throw new ArgumentNullException(nameof(source));
+                _walker = new PeekWalker<T>(_source.GetEnumerator());
             }
 
             public IEnumerator<PeekElement<T>> GetEnumerator()
             {
-                return new PeekWalker<T>(_source.GetEnumerator());
+                if (_walker != null)
+                {
+                    var v = _walker;
+                    _walker = null;
+                    return v;
+                }
+                else
+                    return new PeekWalker<T>(_source.GetEnumerator());
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
+            }
+
+            public IEnumerable<T> Peek
+            {
+                get
+                {
+                    if (_walker != null)
+                        return _walker.Current.Peek;
+                    else
+                        return Enumerable.Empty<T>();
+                }
             }
         }
 
@@ -96,7 +116,7 @@ namespace Amp.Linq
 
             public bool MoveNext()
             {
-                Current = Current?.Peek.FirstOrDefault();
+                Current = Current.GetPeek().FirstOrDefault();
                 return (Current != null);
             }
 
