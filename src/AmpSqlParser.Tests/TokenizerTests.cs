@@ -14,6 +14,47 @@ namespace AmpSqlParser.Tests
     public class TokenizerTests
     {
         public TestContext TestContext { get; set; }
+
+        [TestMethod]
+        public void TestEmpty()
+        {
+            using (StringReader sr = new StringReader(""))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                var tokens = tk.ToArray();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                Assert.AreEqual(0, kinds.Length);
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                    },
+                    kinds);
+
+                Assert.AreEqual("", string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+
+            using (StringReader sr = new StringReader(" "))
+            using (SqlReader rdr = new SqlReader(sr, new SqlSource("<memory>")))
+            using (SqlTokenizer tk = new SqlTokenizer(rdr))
+            {
+                var tokens = tk.ToArray();
+
+                var kinds = tokens.Select(x => x.Kind).ToArray();
+
+                Assert.AreEqual(1, kinds.Length);
+
+                ParseAssert.AreEqual(new SqlKind[] {
+                        K.EndOfStream,
+                    },
+                    kinds);
+
+                Assert.AreEqual(" ", string.Join("", tokens.Select(x => x.ToFullString())));
+            }
+        }
+
+
         [TestMethod]
         public void ScanAll()
         {
@@ -69,7 +110,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -98,7 +139,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -122,7 +163,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -147,7 +188,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -172,7 +213,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -197,7 +238,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -222,7 +263,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -246,7 +287,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -270,7 +311,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -294,7 +335,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -319,7 +360,7 @@ namespace AmpSqlParser.Tests
             {
                 tk.Dialect = SqlDialect.Oracle;
 
-                var tokens = tk.ToArray().AsQueryable();
+                var tokens = tk.ToArray();
 
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -356,7 +397,7 @@ namespace AmpSqlParser.Tests
                 using (SqlTokenizer tk = new SqlTokenizer(rdr))
                 {
                     tk.Dialect = dialect;
-                    var tokens = tk.ToArray().AsQueryable();
+                    var tokens = tk.ToArray();
 
                     var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -376,7 +417,7 @@ namespace AmpSqlParser.Tests
                 {
                     tk.Dialect = dialect;
 
-                    var tokens = tk.ToArray().AsQueryable();
+                    var tokens = tk.ToArray();
 
                     var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -396,7 +437,7 @@ namespace AmpSqlParser.Tests
                 {
                     tk.Dialect = dialect;
 
-                    var tokens = tk.ToArray().AsQueryable();
+                    var tokens = tk.ToArray();
 
                     var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -417,7 +458,7 @@ namespace AmpSqlParser.Tests
                 {
                     tk.Dialect = dialect;
 
-                    var tokens = tk.ToArray().AsQueryable();
+                    var tokens = tk.ToArray();
 
                     var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -452,7 +493,7 @@ namespace AmpSqlParser.Tests
                 {
                     tk.Dialect = dialect;
 
-                    var tokens = tk.ToArray().AsQueryable();
+                    var tokens = tk.ToArray();
 
                     var kinds = tokens.Select(x => x.Kind).ToArray();
 
@@ -495,7 +536,7 @@ namespace AmpSqlParser.Tests
                 using (SqlTokenizer tk = new SqlTokenizer(rdr))
                 {
                     tk.Dialect = dialect;
-                    var tokens = tk.ToArray().AsQueryable();
+                    var tokens = tk.ToArray();
                     var kinds = tokens.Select(x => x.Kind).ToArray();
 
                     if (dialect != SqlDialect.Oracle)
@@ -542,7 +583,7 @@ namespace AmpSqlParser.Tests
                 using (SqlTokenizer tk = new SqlTokenizer(rdr))
                 {
                     tk.Dialect = dialect;
-                    var tokens = tk.ToArray().AsQueryable();
+                    var tokens = tk.ToArray();
                     var kinds = tokens.Select(x => x.Kind).ToArray();
 
                     Assert.AreEqual(16, kinds.Length);
