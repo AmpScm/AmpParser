@@ -207,7 +207,7 @@ namespace Amp.SqlParser
                         break;
                     case '*':
                         Buffer.Append('*');
-                        kind = SqlKind.AsteriksToken;
+                        kind = SqlKind.AsteriksOperatorToken;
                         break;
                     case '+':
                         Buffer.Append('+');
@@ -219,12 +219,21 @@ namespace Amp.SqlParser
                         break;
                     case '/':
                         Buffer.Append('/');
-                        kind = SqlKind.DivToken;
+                        kind = SqlKind.DivOperatorToken;
                         break;
                     case '%':
                         Buffer.Append('%');
                         kind = SqlKind.PercentOperatorToken;
                         break;
+                    case '~' when IsSqlite: // Sqlite only?
+                        Buffer.Append('~');
+                        kind = SqlKind.TildeOperatorToken;
+                        break;
+                    case 'N' when IsOracle && Reader.Peek() == '\'':
+                        Buffer.Append(c);
+                        Reader.Read();
+                        cR = c = '\'';
+                        goto case '\'';
                     default:
                         if (char.IsLetter(c) || c == '_')
                         {

@@ -16,7 +16,7 @@ namespace Amp.SqlParser.Syntax
         }
     }
 
-    class SqlCommaSeparatedTokenList<TElement> : SqlSeparatedTokenList<TElement>, ISqlParsable
+    public class SqlCommaSeparatedTokenList<TElement> : SqlSeparatedTokenList<TElement>, ISqlParsable
         where TElement : AmpSyntax<SqlKind>, ISqlParsable
     {
         protected SqlCommaSeparatedTokenList(IEnumerable<AmpElement<SqlKind>> items) : base(items)

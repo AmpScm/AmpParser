@@ -7,7 +7,7 @@ using Amp.Parser;
 
 namespace Amp.SqlParser
 {
-    public class SqlParserState 
+    public class SqlParserState
     {
         public SqlParserState(SqlParserSettings settings, IEnumerableWithPeek<AmpElement<SqlKind>> tokens)
         {
@@ -57,7 +57,7 @@ namespace Amp.SqlParser
                     return tokens;
             }
 
-            return tokens;            
+            return tokens;
         }
 
         public bool Read()
@@ -66,10 +66,24 @@ namespace Amp.SqlParser
         }
 
         public SqlParserSettings Settings { get; }
-        public AmpElement Error 
-        { 
-            get; 
-            internal set; 
+        public AmpElement Error
+        {
+            get;
+            internal set;
+        }
+
+        internal bool PeekKind(SqlKind kind)
+        {
+            SqlKind? k = Peek.FirstOrDefault()?.Kind;
+
+            return (kind == k);
+        }
+
+        internal bool PeekKind(params SqlKind[] kinds)
+        {
+            SqlKind? k = Peek.FirstOrDefault()?.Kind;
+
+            return kinds.Any(x => x == k);
         }
     }
 }

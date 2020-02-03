@@ -117,7 +117,7 @@ namespace AmpSqlParser.Tests
                 Assert.AreEqual(28, kinds.Length);
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.AsteriksToken, K.FromToken, K.IdentifierToken, K.IdentifierToken,
+                    K.SelectToken, K.AsteriksOperatorToken, K.FromToken, K.IdentifierToken, K.IdentifierToken,
                     K.LeftToken, K.JoinToken, K.IdentifierToken, K.IdentifierToken, K.OnToken, K.IdentifierToken, K.DotToken, K.IdentifierToken, K.EqualOperatorToken, K.IdentifierToken, K.DotToken, K.IdentifierToken,
                     K.WhereToken, K.IdentifierToken, K.EqualOperatorToken, K.IdentifierToken, K.AndToken, K.IdentifierToken, K.EqualOperatorToken, K.NumericValueToken,
                     K.OrderToken, K.ByToken, K.IdentifierToken},
@@ -369,8 +369,8 @@ namespace AmpSqlParser.Tests
                 ParseAssert.AreEqual(new SqlKind[] {
                     K.SelectToken,
                         K.NumericValueToken,  K.PlusOperatorToken,
-                        K.DoubleValueToken, K.AsteriksToken,
-                        K.DoubleValueToken, K.DivToken,
+                        K.DoubleValueToken, K.AsteriksOperatorToken,
+                        K.DoubleValueToken, K.DivOperatorToken,
                         K.DoubleValueToken, K.CommaToken,
                         K.CaseToken, K.WhenToken,
                         K.NumericValueToken, K.EqualOperatorToken,

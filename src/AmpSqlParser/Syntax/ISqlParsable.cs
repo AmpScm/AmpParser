@@ -5,7 +5,7 @@ using Amp.Parser;
 
 namespace Amp.SqlParser.Syntax
 {
-    interface ISqlParsable : IAmpParsable<SqlKind>
+    public interface ISqlParsable : IAmpParsable<SqlKind>
     {
     }
 }

@@ -328,10 +328,10 @@ namespace Amp.SqlParser
         DescendingToken,
         CloseParenToken,
         EqualOperatorToken,
-        AsteriksToken,
+        AsteriksOperatorToken,
         PlusOperatorToken,
         MinusOperatorToken,
-        DivToken,
+        DivOperatorToken,
         PercentOperatorToken,
         LessThanToken,
         GreaterThanToken,
@@ -513,5 +513,8 @@ namespace Amp.SqlParser
         QQ,
         WhereClause,
         JoinClause,
+        WhenClause,
+        SqlCaseClause,
+        TildeOperatorToken,
     }
 }
