@@ -119,7 +119,7 @@ namespace AmpSqlParser.Tests
                 ParseAssert.AreEqual(new SqlKind[] {
                     K.SelectToken, K.AsteriksToken, K.FromToken, K.IdentifierToken, K.IdentifierToken,
                     K.LeftToken, K.JoinToken, K.IdentifierToken, K.IdentifierToken, K.OnToken, K.IdentifierToken, K.DotToken, K.IdentifierToken, K.EqualOperatorToken, K.IdentifierToken, K.DotToken, K.IdentifierToken,
-                    K.WhereToken, K.IdentifierToken, K.EqualOperatorToken, K.IdentifierToken, K.AndToken, K.IdentifierToken, K.EqualOperatorToken, K.IntValueToken,
+                    K.WhereToken, K.IdentifierToken, K.EqualOperatorToken, K.IdentifierToken, K.AndToken, K.IdentifierToken, K.EqualOperatorToken, K.NumericValueToken,
                     K.OrderToken, K.ByToken, K.IdentifierToken},
                     kinds);
 
@@ -144,7 +144,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken},
+                    K.SelectToken, K.NumericValueToken},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -168,7 +168,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken},
+                    K.SelectToken, K.NumericValueToken},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -193,7 +193,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken},
+                    K.SelectToken, K.NumericValueToken},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -218,7 +218,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken},
+                    K.SelectToken, K.NumericValueToken},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -243,7 +243,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken},
+                    K.SelectToken, K.NumericValueToken},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -268,7 +268,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken, K.EndOfStream},
+                    K.SelectToken, K.NumericValueToken, K.EndOfStream},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -292,7 +292,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken},
+                    K.SelectToken, K.NumericValueToken},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -316,7 +316,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken},
+                    K.SelectToken, K.NumericValueToken},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -340,7 +340,7 @@ namespace AmpSqlParser.Tests
                 var kinds = tokens.Select(x => x.Kind).ToArray();
 
                 ParseAssert.AreEqual(new SqlKind[] {
-                    K.SelectToken, K.IntValueToken, K.EndOfStream},
+                    K.SelectToken, K.NumericValueToken, K.EndOfStream},
                     kinds);
 
                 Assert.AreEqual(expected.Replace("\r", ""), string.Join("", tokens.Select(x => x.ToFullString())));
@@ -368,13 +368,13 @@ namespace AmpSqlParser.Tests
 
                 ParseAssert.AreEqual(new SqlKind[] {
                     K.SelectToken,
-                        K.IntValueToken,  K.PlusOperatorToken,
+                        K.NumericValueToken,  K.PlusOperatorToken,
                         K.DoubleValueToken, K.AsteriksToken,
                         K.DoubleValueToken, K.DivToken,
                         K.DoubleValueToken, K.CommaToken,
                         K.CaseToken, K.WhenToken,
-                        K.IntValueToken, K.EqualOperatorToken,
-                        K.IntValueToken,
+                        K.NumericValueToken, K.EqualOperatorToken,
+                        K.NumericValueToken,
                         K.ThenToken,
                         K.ColonOperatorToken, K.IdentifierToken,
                         K.ElseToken, K.StringToken, K.EndToken,

@@ -5,12 +5,11 @@ using Amp.Parser;
 
 namespace Amp.SqlParser.Syntax
 {
-    public class SqlSelectColumn : SqlSyntaxElement, ISqlParsable
+    public class SqlSelectSource : SqlSyntaxElement, ISqlParsable
     {
         public SqlExpression Expression { get; }
         public SqlToken AsToken { get; }
         public SqlToken NameToken { get; }
-
 
         public override IEnumerator<AmpElement<SqlKind>> GetEnumerator()
         {
@@ -24,19 +23,13 @@ namespace Amp.SqlParser.Syntax
         }
 
 
-        #region Parser
-        protected SqlSelectColumn(SqlParserState state, out AmpElement error)
+        #region Parser support
+        protected SqlSelectSource(SqlParserState state, out AmpElement error)
         {
-            Kind = SqlKind.SelectColumnSyntax;
-
-            if (SqlParser.TryParse<SqlExpression>(state, out var sqlExpression))
+            Kind = SqlKind.SqlSelectSource;
+            if (SqlParser.TryParse<SqlExpression>(state, out var expr))
             {
-                Expression = sqlExpression;
-            }
-            else
-            {
-                error = state.Error;
-                return;
+                Expression = expr;
             }
 
             if (state.IsKind(SqlKind.AsToken))

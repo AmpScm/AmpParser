@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Amp.Parser
 {
-    public interface IParsable<TKind>
+    public interface IAmpParsable<TKind>
         where TKind: struct, Enum
     {
     }

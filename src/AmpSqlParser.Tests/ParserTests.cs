@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Amp.Linq;
 using System.Linq;
 using Amp.SqlParser.Syntax;
+using Amp.Parser;
 
 namespace AmpSqlParser.Tests
 {
@@ -31,7 +32,7 @@ namespace AmpSqlParser.Tests
                     tk.Dialect = SqlDialect.Oracle;
 
 
-                    var peekable = tk.AsPeekable();
+                    var peekable = tk.Cast<AmpElement<SqlKind>>().AsPeekable();
 
                     if (peekable.Peek.FirstOrDefault()?.Kind != SqlKind.SelectToken)
                         continue;
@@ -41,17 +42,19 @@ namespace AmpSqlParser.Tests
 
                     var state = new SqlParserState(new SqlParserSettings { Dialect = SqlDialect.Oracle }, peekable);
 
-                    //Assert.IsTrue(SqlParser.TryParse<SqlSelect>(state, out var result), $"Parsing succeeed on {file}");
-                    //
-                    //var rest = state.P
+                    Assert.IsTrue(SqlParser.TryParse<SqlSelect>(state, out var result), $"Parsing succeeed on {file}");
 
-                    Assert.AreEqual(SqlKind.SelectToken, peekable.First().Value.Kind);
+                    if (state.Peek.Any())
+                    {
+                        Console.WriteLine($"Incomplete: {string.Join(", ", state.Peek)}");
+                        GC.KeepAlive(state);
+                    }
 
-                    GC.KeepAlive(peekable);
+                    string expected = File.ReadAllText(file).Replace("\r", "");
+                    string actual = result.ToFullString();
 
-
+                    Assert.AreEqual(expected, actual);
                 }
-
             }
         }
     }

@@ -1,0 +1,356 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AmpParser</name>
+    </assembly>
+    <members>
+        <member name="T:Amp.Linq.AmpQueryable">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.AsPeekable``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Converts the enumerable <paramref name="source"/> to a peekable enumerable
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.AsPeekable``1(System.Func{System.Nullable{``0}})">
+            <summary>
+            Converts the fetch function <paramref name="source"/> to a peekable enumerable
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.AsPeekable``1(System.Func{``0})">
+            <summary>
+            Converts the fetch function <paramref name="source"/> to a peekable enumerable
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.GetMethod``1(System.Type,System.String,System.Object,System.Reflection.BindingFlags)">
+            <summary>
+            Get the method matching the specification
+            </summary>
+            <typeparam name="TFunc"></typeparam>
+            <param name="type"></param>
+            <param name="name"></param>
+            <param name="instance"></param>
+            <param name="flags"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.GetMethodWithInstance``1(System.Type,System.String,System.Reflection.BindingFlags)">
+            <summary>
+            Get the method matching the specification
+            </summary>
+            <typeparam name="TFunc"></typeparam>
+            <param name="type"></param>
+            <param name="name"></param>
+            <param name="flags"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.GetConstructor``1(System.Type,System.Reflection.BindingFlags)">
+            <summary>
+            Gets the constructor matching the specific specification
+            </summary>
+            <typeparam name="TFunc"></typeparam>
+            <param name="type"></param>
+            <param name="flags"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.AsTree``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets <paramref name="rootNode"/> as a tree, to allow walking using tree functions
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.TreeChildren``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets the direct children of <paramref name="rootNode"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.TreeDescendants``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets all the descendants of <paramref name="rootNode"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.TreeDescendantsAndSelf``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets <paramref name="rootNode"/>, followed by all its descendants in tree oder
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.TreeLeafs``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets all leaf nodes below <paramref name="rootNode"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.TreeLeafsIncludingSelf``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets all leaf nodes below <paramref name="rootNode"/>, or just <paramref name="rootNode"/> when <paramref name="rootNode"/> does not have children.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.Children``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets the direct children of <paramref name="rootNode"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.Descendants``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets all descendants of <paramref name="rootNode"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.DescendantsAndSelf``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets <paramref name="rootNode"/>, followed by all its descendants in tree oder
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.Leafs``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets all leaf nodes below <paramref name="rootNode"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.LeafsIncludingSelf``1(Amp.Linq.ITree{``0})">
+            <summary>
+            Gets all leaf nodes below <paramref name="rootNode"/>, or just <paramref name="rootNode"/> when <paramref name="rootNode"/> does not have children.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="rootNode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.EvenItems``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Gets every other item in <paramref name="source"/>, starting by the first item
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.OddItems``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Gets every other item in <paramref name="source"/>, starting by the second item
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.Prepend``1(System.Collections.Generic.IEnumerable{``0},``0)">
+            <summary>
+            Gets <paramref name="source"/> prepended by <paramref name="element"/>
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <param name="source"></param>
+            <param name="element"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.Append``1(System.Collections.Generic.IEnumerable{``0},``0)">
+            <summary>
+            Gets <paramref name="source"/> followed by <paramref name="element"/>
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <param name="source"></param>
+            <param name="element"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.SkipLast``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
+            <summary>
+            Gets all items from <paramref name="source"/>, except for the last <paramref name="skip"/> items.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="source"></param>
+            <param name="skip"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.SingleQueryable``1(``0)">
+            <summary>
+            Gets a queryable containing just <paramref name="item"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Amp.Linq.AmpQueryable.EmptyQueryable``1">
+            <summary>
+            Gets a queryable containing no elements.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:Amp.Linq.IEnumerableWithPeek`1">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:Amp.Linq.IEnumerableWithPeek`1.Peek">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Amp.Linq.ITree`1">
+            <summary>
+            Marker class to mark support for <see cref="T:Amp.Linq.TreeElement`1"/> and <see cref="T:Amp.Linq.AmpQueryable"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:Amp.Linq.PeekElement`1">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Amp.Linq.PeekElement`1.#ctor(`0,System.Lazy{Amp.Linq.PeekElement{`0}})">
+            <summary>
+            Creates a new PeekElement instance
+            </summary>
+            <param name="value"></param>
+            <param name="peekNext"></param>
+        </member>
+        <member name="P:Amp.Linq.PeekElement`1.Value">
+            <summary>
+            Gets the current value
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.PeekElement`1.Peek">
+            <summary>
+            Gets an enumerable containing the next items
+            </summary>
+        </member>
+        <member name="M:Amp.Linq.PeekElement`1.SkipUntil(`0)">
+            <summary>
+            Reads items until the next item is <paramref name="untilItem"/>
+            </summary>
+            <param name="untilItem"></param>
+        </member>
+        <member name="M:Amp.Linq.PeekElement`1.SkipUntilAfter(`0)">
+            <summary>
+            Reads
+            </summary>
+            <param name="untilItem"></param>
+        </member>
+        <member name="T:Amp.Linq.TreeElement`1">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Amp.Linq.TreeElement`1.#ctor(`0)">
+            <summary>
+            
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:Amp.Linq.TreeElement`1.#ctor(`0,System.Collections.Generic.IEnumerable{Amp.Linq.TreeElement{`0}})">
+            <summary>
+            
+            </summary>
+            <param name="item"></param>
+            <param name="ancestors"></param>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.Ancestors">
+            <summary>
+            Enumerates the ancestors of the node, starting at the direct parent
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.AncestorsAndSelf">
+            <summary>
+            Enumerates the node itself and its ancestors, starting at the node itself
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.Children">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.Descendants">
+            <summary>
+            Enumerates the descendants of the node in a depth first order. (So first child, children of that, etc.)
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.DescendantsAndSelf">
+            <summary>
+            Enumerates the node and its descendants
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.Leafs">
+            <summary>
+            Enumerates the descendants that don't have children
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.LeafsIncludingSelf">
+            <summary>
+            Enumerates the descendants that don't have children, including the node itself if it doesn't have children
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.Following">
+            <summary>
+            Enumerates everything that follows the node in tree order.
+            </summary>
+        </member>
+        <member name="P:Amp.Linq.TreeElement`1.FollowingSiblings">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Amp.Parser.AmpElement.IsError">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Amp.Parser.AmpElement`1.Kind">
+            <summary>
+            Gets the syntax/token kind
+            </summary>
+        </member>
+        <member name="P:Amp.Syntax.AmpSyntaxList`2.Count">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Amp.Syntax.AmpSyntaxList`2.Item(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Amp.Syntax.AmpSyntaxList`2.Items">
+            <summary>
+            
+            </summary>
+        </member>
+    </members>
+</doc>

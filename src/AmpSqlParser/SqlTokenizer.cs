@@ -261,7 +261,7 @@ namespace Amp.SqlParser
                                 }
                             }
 
-                            kind = (gotDot || gotE) ? SqlKind.DoubleValueToken : SqlKind.IntValueToken;
+                            kind = (gotDot || gotE) ? SqlKind.DoubleValueToken : SqlKind.NumericValueToken;
                         }
                         else
                         {
@@ -697,7 +697,7 @@ namespace Amp.SqlParser
                     return SqlKind.FreeToken;
                 case "FULL": // when IsSql1999:
                     return SqlKind.FullToken;
-                case "FUNCTION": // when IsSql1999:
+                case "FUNCTION" when !IsOracle: // when IsSql1999:
                     return SqlKind.FunctionToken;
                 case "GENERAL": // when IsSql1999:
                     return SqlKind.GeneralToken;
@@ -761,7 +761,7 @@ namespace Amp.SqlParser
                     return SqlKind.IterateToken;
                 case "JOIN": // when IsSql1999:
                     return SqlKind.JoinToken;
-                case "KEY": // when IsSql1999:
+                case "KEY" when !IsOracle: // when IsSql1999:
                     return SqlKind.KeyToken;
                 case "LANGUAGE": // when IsSql1999:
                     return SqlKind.LanguageToken;
@@ -871,7 +871,7 @@ namespace Amp.SqlParser
                     return SqlKind.PathToken;
                 case "POSTFIX": // when IsSql1999:
                     return SqlKind.PostfixToken;
-                case "PRECISION": // when IsSql1999:
+                case "PRECISION" when !IsOracle: // when IsSql1999:
                     return SqlKind.PrecisionToken;
                 case "PREFIX": // when IsSql1999:
                     return SqlKind.PrefixToken;
@@ -943,7 +943,7 @@ namespace Amp.SqlParser
                     return SqlKind.SearchToken;
                 case "SECOND": // when IsSql1999:
                     return SqlKind.SecondToken;
-                case "SECTION": // when IsSql1999:
+                case "SECTION" when !IsOracle: // when IsSql1999:
                     return SqlKind.SectionToken;
                 case "SELECT": // when IsSql1999:
                     return SqlKind.SelectToken;
@@ -979,7 +979,7 @@ namespace Amp.SqlParser
                     return SqlKind.SqlWarningToken;
                 case "START": // when IsSql1999:
                     return SqlKind.StartToken;
-                case "STATE": // when IsSql1999:
+                case "STATE" when !IsOracle: // when IsSql1999:
                     return SqlKind.StateToken;
                 case "STATEMENT": // when IsSql1999:
                     return SqlKind.StatementToken;
@@ -1039,7 +1039,7 @@ namespace Amp.SqlParser
                     return SqlKind.UserToken;
                 case "USING": // when IsSql1999:
                     return SqlKind.UsingToken;
-                case "VALUE": // when IsSql1999:
+                case "VALUE" when !IsOracle: // when IsSql1999:
                     return SqlKind.ValueToken;
                 case "VALUES": // when IsSql1999:
                     return SqlKind.ValuesToken;
@@ -1067,7 +1067,7 @@ namespace Amp.SqlParser
                     return SqlKind.WriteToken;
                 case "YEAR": // when IsSql1999:
                     return SqlKind.YearToken;
-                case "ZONE": // when IsSql1999:
+                case "ZONE" when !IsOracle:// when IsSql1999:
                     return SqlKind.ZoneToken;
 
                 // SQLServer 2019

@@ -8,17 +8,35 @@ namespace Amp.Linq
 {
     public static partial class AmpQueryable
     {
+        /// <summary>
+        /// Converts the enumerable <paramref name="source"/> to a peekable enumerable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public static IEnumerableWithPeek<T> AsPeekable<T>(this IEnumerable<T> source)
         {
             return new PeekWalkable<T>(source);
         }
 
+        /// <summary>
+        /// Converts the fetch function <paramref name="source"/> to a peekable enumerable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public static IEnumerableWithPeek<T> AsPeekable<T>(this Func<T?> source)
             where T :struct
         {
             return AsPeekable(WalkSource(source));
         }
 
+        /// <summary>
+        /// Converts the fetch function <paramref name="source"/> to a peekable enumerable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public static IEnumerableWithPeek<T> AsPeekable<T>(this Func<T> source)
             where T : class
         {

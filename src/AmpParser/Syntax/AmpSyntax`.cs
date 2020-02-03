@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ using Amp.Tokenizer;
 
 namespace Amp.Syntax
 {
+    [DebuggerDisplay("{Kind}: {ToString(),nq}")]
     public abstract class AmpSyntax<TKind> : AmpElement<TKind>, IEnumerable<AmpElement<TKind>>, ITree<AmpElement<TKind>>
         where TKind : struct, Enum
     {

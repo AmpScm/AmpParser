@@ -387,7 +387,7 @@ namespace Amp.SqlParser
         CloseBracket,
         DotToken,
         AmpersandToken,
-        IntValueToken,
+        NumericValueToken,
         DoubleValueToken,
         RaiseErrorToken,
         FillFactorToken,
@@ -504,5 +504,14 @@ namespace Amp.SqlParser
         IncompleteStringToken,
         IncompleteQuotedIdentifierToken,
         OuterJoinToken,
+        //
+        SelectSyntax,
+        FromClause,
+        SelectColumnSyntax,
+        SqlSelectSource,
+        //
+        QQ,
+        WhereClause,
+        JoinClause,
     }
 }
